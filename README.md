@@ -126,6 +126,93 @@ Here are some representative projects built on top of Agent-R1:
 - **[Cast-R1](https://arxiv.org/abs/2602.13802)**: A learned agentic framework that reformulates time series forecasting as a sequential decision-making problem. Built upon Agent-R1, it features a memory-based state management mechanism and a tool-augmented workflow, trained via a two-stage strategy combining supervised fine-tuning with multi-turn reinforcement learning to autonomously gather evidence, reason, and iteratively refine forecasts.
 
   
+
+## ❓ FAQ
+
+### What is Agent-R1?
+
+Agent-R1 is an open-source framework for training powerful language **agents** with **end-to-end reinforcement learning**. It is designed for multi-step agent tasks where the model interacts with environments and tools across multiple rounds.
+
+### How does Agent-R1 compare to other RL frameworks?
+
+| Framework | Focus | Training Method | Best For |
+|-----------|-------|-----------------|----------|
+| Agent-R1 | Multi-step agents | End-to-End RL + Step-level MDP | Tool-augmented agents |
+| veRL | LLM RL | Standard RLHF | Single-turn LLM |
+| DeepSeek-R1 | Reasoning | RL for reasoning | Math/coding tasks |
+| RAGEN | RAG agents | RL for retrieval | RAG workflows |
+
+**Agent-R1's key innovation**: Step-level MDP treats each interaction as a proper RL transition, not one growing token sequence.
+
+### What is Step-level MDP?
+
+Step-level MDP is Agent-R1's core abstraction where:
+- Each step stores its own prompt and response
+- Environment controls next observation (not token concatenation)
+- Context can be truncated/summarized/rewritten between steps
+- Standard RL loops (`obs → action → step → next_obs`) apply naturally
+
+### What are Layered Abstractions?
+
+Layered Abstractions provide:
+- **AgentEnvLoop**: Multi-step rollout driver
+- **ToolEnv**: Tool calls and environment feedback
+- **Policy wrappers**: Model interaction patterns
+- **Reward functions**: Process & outcome rewards
+
+### What models does Agent-R1 support?
+
+Agent-R1 uses veRL runtime and supports:
+- Qwen series (Qwen2.5-3B, Qwen3-4B)
+- Custom models via veRL integration
+- Vision-Language Models (VLMs) for multimodal agents
+
+### How do I get started?
+
+1. **Setup environment**: Same as [veRL](https://verl.readthedocs.io/en/latest/start/install.html) (requires `verl==0.7.0`)
+2. **Sanity check**: Run GSM8K single-step script
+   ```bash
+   python3 examples/data_preprocess/gsm8k.py --local_save_dir ~/data/gsm8k
+   bash examples/run_qwen2.5-3b.sh
+   ```
+3. **Agent workflow**: Run multi-step agent training
+   ```bash
+   python3 examples/data_preprocess/gsm8k_tool.py --local_save_dir ~/data/gsm8k_tool
+   bash examples/run_qwen3-4b_gsm8k_tool.sh
+   ```
+
+### What benchmarks does Agent-R1 use?
+
+- **GAIA**: General AI assistant benchmark
+- **AgentBench**: Agent evaluation benchmark
+- **WebShop**: Web-based shopping agent
+- **OSWorld**: Operating system tasks
+
+### What projects use Agent-R1?
+
+- **TableMind**: Tool-augmented table reasoning
+- **PaperScout**: Academic paper search (with PSPO method)
+- **Cast-R1**: Time series forecasting agent
+
+### Does Agent-R1 support process rewards?
+
+Yes. Agent-R1 supports:
+- **Process rewards**: Rewards for each tool call effectiveness
+- **Outcome rewards**: Final task success
+- **Reward normalization**: Inspired by PRIME for balance
+
+### What license does Agent-R1 use?
+
+Open-source (check repository for specific license).
+
+### Where can I find help?
+
+- 📚 Documentation: [agentr1.github.io/Agent-R1](https://agentr1.github.io/Agent-R1/)
+- 📄 Paper: [arXiv:2511.14460](https://arxiv.org/abs/2511.14460)
+- 🐛 Issues: [GitHub Issues](https://github.com/AgentR1/Agent-R1/issues)
+- 💬 DeepWiki: [deepwiki.com/AgentR1/Agent-R1](https://deepwiki.com/AgentR1/Agent-R1)
+
+
 ## Acknowledgements
 
 This work is conducted at the **State Key Laboratory of Cognitive Intelligence, USTC**. We gratefully acknowledge the inspiring ideas and early insights from [DeepSeek-R1](https://github.com/deepseek-ai/DeepSeek-R1), [veRL](https://github.com/volcengine/verl), and [RAGEN](https://github.com/ZihanWang314/ragen), which have significantly influenced the development of Agent-R1. We also sincerely thank [**Prof. Qi Liu**](http://staff.ustc.edu.cn/~qiliuql/) and [**Prof. Mingyue Cheng**](https://mingyue-cheng.github.io/) for their guidance and support.
