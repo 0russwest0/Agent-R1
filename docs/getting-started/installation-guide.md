@@ -4,7 +4,7 @@ Agent-R1 uses the same environment setup as `verl`.
 
 ## Base Environment
 
-Follow the official [`verl` installation guide](https://verl.readthedocs.io/en/latest/start/install.html), but make sure the environment ends up with `verl==0.7.0`.
+Follow the official [`verl` installation guide](https://verl.readthedocs.io/en/latest/start/install.html), but use a recent source checkout of `verl` rather than the old release used by earlier Agent-R1 versions. Agent-R1 relies on the newer AgentFlow / async rollout / reward-loop APIs and on `verl.trainer.config` being available as package data.
 
 If you want a broader overview of the base training workflow, the [`verl` quickstart](https://verl.readthedocs.io/en/latest/start/quickstart.html) is also useful.
 
@@ -12,7 +12,7 @@ If you want a broader overview of the base training workflow, the [`verl` quicks
 
 Once the `verl` environment is working, Agent-R1 should run in the same environment. In practice, that means you can:
 
-- prepare a Python environment with `verl==0.7.0`
+- prepare a Python environment with a compatible recent source installation of `verl`
 - clone this repository
 - run Agent-R1 commands directly from the repository root
 

@@ -1,0 +1,15 @@
+- name: hotpotqa_agent
+  _target_: recipe.hotpotqa.hotpotqa_agent_flow.HotpotQAAgentFlow
+  max_steps: 5
+  max_parallel_calls: 4
+  force_first_search: true
+
+  # BGE model id or local mirror (must match `process_hotpotqa.py --embedding_model` when building index.bin)
+  embedding_model_name: ${oc.env:HOTPOTQA_EMBEDDING_MODEL,BAAI/bge-large-en-v1.5}
+  # Retrieval corpus/index root, separate from train/validation parquet data root.
+  corpus_data_dir: ${oc.env:HOTPOTQA_CORPUS_DATA_ROOT,data/corpus/hotpotqa_corpus}
+  # BGE is separate from vLLM: no gpu_memory_utilization knob; sharing a GPU with vLLM(0.7) is best-effort—tune vLLM util downward or use CPU (`embedding_devices` / HOTPOTQA_EMBEDDING_*).
+  # null: use HOTPOTQA_EMBEDDING_DEVICE (default cpu), or per-worker cuda:i if HOTPOTQA_EMBEDDING_PER_WORKER_GPU=1
+  embedding_devices: null
+  # Like Agent-R1-legacy: on parse/arg errors inject brief feedback into next user turn and try lenient JSON recovery
+  enable_tool_parse_feedback: true

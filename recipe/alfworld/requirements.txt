@@ -1,0 +1,7 @@
+# Data prep
+pandas
+pyarrow
+
+# Runtime environment
+alfworld
+textworld
