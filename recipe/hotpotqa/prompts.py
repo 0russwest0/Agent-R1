@@ -5,7 +5,9 @@ HotpotQA-only: `### Retrieved Passages`, `### Recent tool / format issues`, and
 `<answer>` when finishing from current evidence.
 """
 
-HOTPOTQA_SYSTEM_PROMPT = "You are a research agent. Your goal is to answer the User Query using Wikipedia search evidence."
+HOTPOTQA_SYSTEM_PROMPT = (
+    "You are a research agent. Your goal is to answer the User Query using Wikipedia search evidence."
+)
 
 HOTPOTQA_USER_PROMPT = """### User Query 
 {user_query}

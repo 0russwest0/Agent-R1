@@ -239,9 +239,7 @@ class HotpotQAAgentFlow(AgentFlowBase):
         min_chars = 400
         last_ids: list[int] = []
         while True:
-            messages = self._build_messages(
-                question, passages, history_actions, fb_text, max_passage_chars=max_chars
-            )
+            messages = self._build_messages(question, passages, history_actions, fb_text, max_passage_chars=max_chars)
             last_ids = await self.apply_chat_template(messages, tools=self.tool_schemas)
             if len(last_ids) <= self.prompt_length:
                 return last_ids

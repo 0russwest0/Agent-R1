@@ -406,8 +406,7 @@ def compute_reinforce_plus_plus_baseline_outcome_advantage(
             id2mean[idx] = torch.mean(torch.stack(scores)) if len(scores) > 1 else step_scores.new_tensor(0.0)
 
         traj2adv = {
-            traj_uid: total_score - id2mean[traj2index[traj_uid]]
-            for traj_uid, total_score in traj2total_score.items()
+            traj_uid: total_score - id2mean[traj2index[traj_uid]] for traj_uid, total_score in traj2total_score.items()
         }
 
         scores = step_scores.clone()
@@ -448,10 +447,9 @@ def compute_rloo_outcome_advantage(
             prompt_idx = traj2index[traj_uid]
             response_num = len(id2score[prompt_idx])
             if response_num > 1:
-                traj2adv[traj_uid] = (
-                    total_score * response_num / (response_num - 1)
-                    - id2mean[prompt_idx] * response_num / (response_num - 1)
-                )
+                traj2adv[traj_uid] = total_score * response_num / (response_num - 1) - id2mean[
+                    prompt_idx
+                ] * response_num / (response_num - 1)
             else:
                 traj2adv[traj_uid] = total_score
 

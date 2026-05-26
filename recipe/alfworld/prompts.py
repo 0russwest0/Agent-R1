@@ -41,9 +41,7 @@ EXEC_ACTION_TOOL_SCHEMA = {
     "type": "function",
     "function": {
         "name": "env_step",
-        "description": (
-            "Execute one ALFWorld TextWorld command and return the next official observation."
-        ),
+        "description": ("Execute one ALFWorld TextWorld command and return the next official observation."),
         "parameters": {
             "type": "object",
             "properties": {

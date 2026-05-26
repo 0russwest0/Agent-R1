@@ -25,7 +25,7 @@ def _load_corpus_texts(corpus_path: Path) -> list[str]:
             if not line:
                 continue
             rec = json.loads(line)
-            corpus.append(f'{rec.get("title", "")} {rec.get("text", "")}'.strip())
+            corpus.append(f"{rec.get('title', '')} {rec.get('text', '')}".strip())
     return corpus
 
 
@@ -93,6 +93,7 @@ def main() -> None:
     index.add(vectors)
     faiss.write_index(index, str(index_path))
     print(f"[hotpotqa] saved index to {index_path}")
+
 
 if __name__ == "__main__":
     main()

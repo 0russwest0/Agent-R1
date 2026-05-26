@@ -113,14 +113,10 @@ class PaperSearchInferenceAgent:
         self._sampling_params = SamplingParams(temperature=temp, max_tokens=self.response_length)
 
         _ps_base = kwargs.get("paper_search_base_url", os.getenv("PAPER_SEARCH_BASE_URL"))
-        _search_src = (
-            kwargs.get("search_source", os.getenv("PAPER_AGENT_V2_SEARCH_SOURCE", "local_db")).strip().lower()
-        )
+        _search_src = kwargs.get("search_source", os.getenv("PAPER_AGENT_V2_SEARCH_SOURCE", "local_db")).strip().lower()
         if _search_src not in {"local_db", "google"}:
             raise ValueError("search_source / PAPER_AGENT_V2_SEARCH_SOURCE must be 'local_db' or 'google'")
-        _from_m = _optional_year_month_cli(
-            kwargs.get("paper_from_month", os.getenv("PAPER_AGENT_V2_PAPER_FROM"))
-        )
+        _from_m = _optional_year_month_cli(kwargs.get("paper_from_month", os.getenv("PAPER_AGENT_V2_PAPER_FROM")))
         _to_m = _optional_year_month_cli(kwargs.get("paper_to_month", os.getenv("PAPER_AGENT_V2_PAPER_TO")))
         self.client = InferencePaperClient(
             base_url=_ps_base,

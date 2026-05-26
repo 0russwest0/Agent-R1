@@ -50,8 +50,7 @@ SEARCH_TOOL_SCHEMA = {
                 "query": {
                     "type": "string",
                     "description": (
-                        "A single search query in natural language or keywords. "
-                        "Must differ from all history queries."
+                        "A single search query in natural language or keywords. Must differ from all history queries."
                     ),
                 }
             },

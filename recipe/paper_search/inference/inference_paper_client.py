@@ -70,7 +70,9 @@ class InferencePaperClient:
             )
         return await self._paper.search(query=query, limit=limit, year=year)
 
-    async def get_paper(self, paper_id: str, fields: str = "title,abstract,year,authors,externalIds") -> Optional[Paper]:
+    async def get_paper(
+        self, paper_id: str, fields: str = "title,abstract,year,authors,externalIds"
+    ) -> Optional[Paper]:
         """Fetch a single paper record."""
         return await self._paper.get_paper(paper_id, fields=fields)
 

@@ -184,7 +184,9 @@ class AlfworldAgentFlow(AgentFlowBase):
                         done = bool(result["done"])
                         info = result.get("info", {}) or {}
                         admissible_commands = info.get("admissible_commands")
-                        self.current_admissible_commands = admissible_commands if isinstance(admissible_commands, list) else []
+                        self.current_admissible_commands = (
+                            admissible_commands if isinstance(admissible_commands, list) else []
+                        )
                         self.history_actions = result.get("history_actions", self.history_actions)
                         if "success" in info:
                             final_success_flag = bool(info["success"])
@@ -209,7 +211,7 @@ class AlfworldAgentFlow(AgentFlowBase):
                     "reward_extra_info": {
                         **build_reward_extra_info(env_reward),
                         "is_action_valid": bool(is_action_valid),
-                    }
+                    },
                 },
             )
             step = await self._postprocess(step, **kwargs)

@@ -37,4 +37,3 @@ class StepResponse(BaseModel):
     reward: float
     done: bool
     info: dict[str, Any] = Field(default_factory=dict)
-

@@ -13,6 +13,7 @@ Usage:
         --train data/corpus/hotpotqa/train.parquet \
         --val   data/corpus/hotpotqa/validation.parquet
 """
+
 from __future__ import annotations
 
 import argparse
@@ -29,9 +30,9 @@ def verify_parquet(path: str, label: str) -> bool:
         return False
 
     df = pd.read_parquet(p)
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print(f"[{label}] {p}  ({len(df)} rows, columns={list(df.columns)})")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
 
     ok = True
 
@@ -143,12 +144,12 @@ def main():
         if not verify_parquet(path, label):
             all_ok = False
 
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     if all_ok:
         print("ALL CHECKS PASSED — dataset ready for training")
     else:
         print("SOME CHECKS FAILED — fix issues above before training")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
     sys.exit(0 if all_ok else 1)
 
 

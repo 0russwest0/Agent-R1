@@ -114,4 +114,3 @@ def compute_score(
     norm_gts = {_normalize_answer(answer) for answer in ground_truths}
 
     return 1.0 if norm_pred in norm_gts else 0.0
-

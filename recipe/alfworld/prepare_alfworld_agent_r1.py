@@ -60,7 +60,7 @@ def _extract_goal_text(game_data: dict[str, Any], traj_data: dict[str, Any]) -> 
         except json.JSONDecodeError:
             pass
 
-    anns = ((traj_data.get("turk_annotations") or {}).get("anns") or [])
+    anns = (traj_data.get("turk_annotations") or {}).get("anns") or []
     if anns and isinstance(anns[0], dict):
         task_desc = str(anns[0].get("task_desc", "")).strip()
         if task_desc:

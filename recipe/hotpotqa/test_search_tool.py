@@ -12,6 +12,7 @@ Optional env vars (same as recipe/hotpotqa/utils.py):
   HOTPOTQA_EMBEDDING_DEVICE defaults to cpu; for BGE encoding e.g. cuda:0 (when not using HOTPOTQA_EMBEDDING_PER_WORKER_GPU)
   HOTPOTQA_EMBEDDING_PER_WORKER_GPU  if 1, agent worker i uses cuda:i (colocate with training GPUs)
 """
+
 from __future__ import annotations
 
 import argparse

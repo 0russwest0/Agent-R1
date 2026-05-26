@@ -43,9 +43,7 @@ def _action_type(action: str) -> str:
 
 def _click_result_count(actions: list[str]) -> int:
     return sum(
-        1
-        for action in actions
-        if action.startswith("click[") and action not in {"click[Next >]", "click[< Prev]"}
+        1 for action in actions if action.startswith("click[") and action not in {"click[Next >]", "click[< Prev]"}
     )
 
 

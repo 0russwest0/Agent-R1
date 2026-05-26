@@ -9,7 +9,12 @@ from transformers import AutoProcessor, AutoTokenizer
 
 from agent_r1.agent_flow.agent_flow import AgentFlowBase, AgentFlowOutput, AgentFlowStep, register
 from agent_r1.reward_loop.reward_loop import RewardLoopWorker
-from recipe.paper_search.prompts import PAPERSEARCH_SYSTEM_PROMPT, PAPERSEARCH_TOOL_SCHEMAS, PAPERSEARCH_USER_PROMPT, SELECT_PROMPT
+from recipe.paper_search.prompts import (
+    PAPERSEARCH_SYSTEM_PROMPT,
+    PAPERSEARCH_TOOL_SCHEMAS,
+    PAPERSEARCH_USER_PROMPT,
+    SELECT_PROMPT,
+)
 from recipe.paper_search.tool_utils import (
     PAPER_SEARCH_TOOL_NAMES,
     decode_tool_arguments,

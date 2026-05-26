@@ -130,10 +130,7 @@ def _print_summary(summary: dict[str, Any]) -> None:
             task_stats = split_summary["tasks"].get(task_family)
             if not task_stats:
                 continue
-            print(
-                f"  {task_family:<28} score={task_stats['score']:.4f} "
-                f"num_tasks={task_stats['num_tasks']}"
-            )
+            print(f"  {task_family:<28} score={task_stats['score']:.4f} num_tasks={task_stats['num_tasks']}")
 
 
 def main() -> None:
