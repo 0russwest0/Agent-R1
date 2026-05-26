@@ -1,0 +1,8 @@
+# Data prep
+pandas
+pyarrow
+
+# Paper Search services and inference helpers
+httpx
+openai
+python-dotenv

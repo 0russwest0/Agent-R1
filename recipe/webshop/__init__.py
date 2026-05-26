@@ -1,0 +1,2 @@
+"""WebShop recipe package."""
+

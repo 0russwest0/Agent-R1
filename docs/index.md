@@ -31,6 +31,7 @@ Agent-R1 is an open-source framework for training powerful language agents with 
 - Start with [`Getting Started`](getting-started/index.md) if you want the minimal path: use the same environment as `verl`, run a sanity check, and confirm the repository is ready.
 - Read [`Step-level MDP`](core-concepts/step-level-mdp.md) and [`Layered Abstractions`](core-concepts/layered-abstractions.md) if you want to understand the framework design before touching code.
 - Follow [`Agent Task Tutorial`](tutorials/agent-task.md) if you want to see the main Agent-R1 workflow: multi-step interaction through `AgentEnvLoop` and `ToolEnv`.
+- Use [`Datasets and Algorithms`](tutorials/datasets-and-algorithms.md) as the script reference for data preprocessing, runnable examples, and supported RL baselines.
 
 ## Scope of This Documentation
 

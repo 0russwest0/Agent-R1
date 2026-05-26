@@ -76,46 +76,80 @@ This makes Agent-R1 a better fit for real multi-step agent tasks with tool use, 
 
 - The default [`main`](https://github.com/AgentR1/Agent-R1/tree/main) branch contains the new **v0.1.0** architecture based on **Step-level MDP** and **Layered Abstractions**.
 - The previous implementation is preserved in the [`legacy`](https://github.com/AgentR1/Agent-R1/tree/legacy) branch for reference.
-- The current version uses the same runtime environment as `verl` and requires **`verl==0.7.0`**.
+- The current version follows the recent `verl` AgentFlow / async rollout stack. Install `verl` from a compatible recent source checkout instead of pinning to the old release used by earlier Agent-R1 versions.
 
 
 
 ## Getting Started
 
-Agent-R1 uses the same environment setup as [verl](https://verl.readthedocs.io/en/latest/start/install.html), and the current version requires `verl==0.7.0`. You only need to clone this repository; there is no separate Agent-R1 installation step.
+Agent-R1 uses the same environment setup as [verl](https://verl.readthedocs.io/en/latest/start/install.html). Use a recent source installation of `verl` that includes the AgentFlow, async rollout, reward-loop, and `verl.trainer.config` package-data APIs used by this repository.
 
 The recommended path is:
 
 1. Read the [Getting Started](https://agentr1.github.io/Agent-R1/getting-started/) page for the minimal setup flow.
-2. Use [`examples/data_preprocess/gsm8k.py`](examples/data_preprocess/gsm8k.py) and [`examples/run_qwen2.5-3b.sh`](examples/run_qwen2.5-3b.sh) as a sanity check that the environment is wired correctly.
-3. Move to the [Agent Task Tutorial](https://agentr1.github.io/Agent-R1/tutorials/agent-task/) for the main Agent-R1 workflow based on multi-step interaction and tool use.
+2. Use [`examples/data_preprocess/gsm8k_tool.py`](examples/data_preprocess/gsm8k_tool.py) and [`examples/run_qwen3-4b_gsm8k_tool.sh`](examples/run_qwen3-4b_gsm8k_tool.sh) as a compact sanity check that the environment is wired correctly.
+3. Move to the [Datasets and Algorithms](https://agentr1.github.io/Agent-R1/tutorials/datasets-and-algorithms/) guide for HotpotQA, Paper Search, ALFWorld, WebShop, StepPO, and baseline scripts.
 
-### Stage 1: Sanity Check the Base Training Stack
+### Stage 1: Sanity Check the Agent Training Stack
 
-Prepare a minimal GSM8K dataset and run the single-step script:
-
-```bash
-python3 examples/data_preprocess/gsm8k.py --local_save_dir ~/data/gsm8k
-bash examples/run_qwen2.5-3b.sh
-```
-
-This stage is only a **setup check**. It helps confirm that your environment, model path, dataset path, and training stack are wired correctly.
-
-### Stage 2: Run the Main Agent-R1 Workflow
-
-Prepare the tool-augmented dataset and launch the multi-step agent training script:
+Prepare the tool-augmented GSM8K dataset and run the Qwen3 tool-use script:
 
 ```bash
 python3 examples/data_preprocess/gsm8k_tool.py --local_save_dir ~/data/gsm8k_tool
 bash examples/run_qwen3-4b_gsm8k_tool.sh
 ```
 
-This is the main Agent-R1 path, where `AgentEnvLoop` drives multi-step rollout and `ToolEnv` handles tool calls and environment feedback.
+This stage is a compact **setup check**. It helps confirm that your environment, model path, dataset path, rollout engine, and Agent-R1 tool loop are wired correctly.
+
+### Stage 2: Run StepPO or a Multi-Dataset Recipe
+
+Launch StepPO on GSM8K-tool or move to a larger agent benchmark:
+
+```bash
+bash examples/run_qwen3-4b_gsm8k_tool_steppo.sh
+bash examples/run_hotpotqa_steppo.sh
+bash examples/run_papersearch_steppo.sh
+bash examples/run_alfworld_steppo.sh
+bash examples/run_webshop_steppo.sh
+```
+
+This is the main Agent-R1 path, where agent flows drive multi-step rollout and task recipes define tools, environments, rewards, and data processing.
 
 Core concepts:
 
 - [Step-level MDP](https://agentr1.github.io/Agent-R1/core-concepts/step-level-mdp/)
 - [Layered Abstractions](https://agentr1.github.io/Agent-R1/core-concepts/layered-abstractions/)
+- [Datasets and Algorithms](https://agentr1.github.io/Agent-R1/tutorials/datasets-and-algorithms/)
+
+## Datasets, Scripts, and Algorithms
+
+Agent-R1 is not tied to one benchmark. The repository now includes GSM8K-tool, HotpotQA, Paper Search, ALFWorld, and WebShop recipes that share the same trainer and agent-flow contracts.
+
+The repository currently includes:
+
+- data processing scripts under [`examples/data_preprocess`](examples/data_preprocess) and [`recipe`](recipe)
+- task recipes for HotpotQA, Paper Search, ALFWorld, and WebShop under [`recipe`](recipe)
+- Paper Search JSONL data under [`recipe/paper_search/inference/datasets`](recipe/paper_search/inference/datasets)
+- StepPO, GRPO, GSPO, token-GAE, RLOO, GiGPO, and REINFORCE++ scripts under [`examples`](examples)
+
+For example:
+
+```bash
+python3 examples/data_preprocess/gsm8k_tool.py --local_save_dir ~/data/gsm8k_tool
+
+bash examples/run_qwen3-4b_gsm8k_tool.sh
+bash examples/run_qwen3-4b_gsm8k_tool_steppo.sh
+bash examples/run_hotpotqa_steppo.sh
+bash examples/run_papersearch_steppo.sh
+bash examples/run_alfworld_steppo.sh
+bash examples/run_webshop_steppo.sh
+```
+
+The trainer supports multiple advantage estimators through `algorithm.adv_estimator`, including `gae`, `token_gae`, `grpo`, `rloo`, `reinforce_plus_plus`, `reinforce_plus_plus_baseline`, and `gigpo` when the agent flow provides `anchor_obs`.
+
+StepPO is included as a first-class Agent-R1 recipe: it combines step-level GAE, `algorithm.adv_estimator=gae`, with GSPO sequence-level policy optimization, `actor_rollout_ref.actor.policy_loss.loss_mode=gspo`.
+
+See the [Datasets and Algorithms guide](docs/tutorials/datasets-and-algorithms.md) for the full script matrix, dataset recipe pattern, and data schema.
 
 ## Awesome Projects Using Agent-R1
 
