@@ -8,15 +8,15 @@ The example uses GSM8K, but the important part is not the benchmark itself. The 
 
 This tutorial uses two existing files:
 
-- dataset preprocessing: [`examples/data_preprocess/gsm8k_tool.py`](https://github.com/AgentR1/Agent-R1/blob/main/examples/data_preprocess/gsm8k_tool.py)
-- training script: [`examples/run_qwen3-4b_gsm8k_tool.sh`](https://github.com/AgentR1/Agent-R1/blob/main/examples/run_qwen3-4b_gsm8k_tool.sh)
+- dataset preprocessing: [`recipes/gsm8k/preprocess_tool.py`](https://github.com/AgentR1/Agent-R1/blob/main/recipes/gsm8k/preprocess_tool.py)
+- training script: [`examples/gsm8k/run_grpo.sh`](https://github.com/AgentR1/Agent-R1/blob/main/examples/gsm8k/run_grpo.sh)
 
 ## 1. Prepare the Agent Dataset
 
 Generate the tool-augmented GSM8K dataset:
 
 ```bash
-python3 examples/data_preprocess/gsm8k_tool.py --local_save_dir ~/data/gsm8k_tool
+python3 -m recipes.gsm8k.preprocess_tool --local_save_dir ~/data/gsm8k_tool
 ```
 
 Compared with the single-step sanity-check dataset, this preprocessing script adds two fields that make the task agentic:
@@ -35,7 +35,7 @@ Conceptually, each sample says:
 Run:
 
 ```bash
-bash examples/run_qwen3-4b_gsm8k_tool.sh
+bash examples/gsm8k/run_grpo.sh
 ```
 
 This script switches the rollout from single-step generation to the agent loop:

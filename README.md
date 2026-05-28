@@ -87,7 +87,7 @@ Agent-R1 uses the same environment setup as [verl](https://verl.readthedocs.io/e
 The recommended path is:
 
 1. Read the [Getting Started](https://agentr1.github.io/Agent-R1/getting-started/) page for the minimal setup flow.
-2. Use [`examples/data_preprocess/gsm8k.py`](examples/data_preprocess/gsm8k.py) and [`examples/run_qwen2.5-3b.sh`](examples/run_qwen2.5-3b.sh) as a sanity check that the environment is wired correctly.
+2. Use [`recipes/gsm8k/preprocess.py`](recipes/gsm8k/preprocess.py) and [`examples/gsm8k/run_ppo.sh`](examples/gsm8k/run_ppo.sh) as a sanity check that the environment is wired correctly.
 3. Move to the [Agent Task Tutorial](https://agentr1.github.io/Agent-R1/tutorials/agent-task/) for the main Agent-R1 workflow based on multi-step interaction and tool use.
 
 ### Stage 1: Sanity Check the Base Training Stack
@@ -95,8 +95,8 @@ The recommended path is:
 Prepare a minimal GSM8K dataset and run the single-step script:
 
 ```bash
-python3 examples/data_preprocess/gsm8k.py --local_save_dir ~/data/gsm8k
-bash examples/run_qwen2.5-3b.sh
+python3 -m recipes.gsm8k.preprocess --local_save_dir ~/data/gsm8k
+bash examples/gsm8k/run_ppo.sh
 ```
 
 This stage is only a **setup check**. It helps confirm that your environment, model path, dataset path, and training stack are wired correctly.
@@ -106,8 +106,8 @@ This stage is only a **setup check**. It helps confirm that your environment, mo
 Prepare the tool-augmented dataset and launch the multi-step agent training script:
 
 ```bash
-python3 examples/data_preprocess/gsm8k_tool.py --local_save_dir ~/data/gsm8k_tool
-bash examples/run_qwen3-4b_gsm8k_tool.sh
+python3 -m recipes.gsm8k.preprocess_tool --local_save_dir ~/data/gsm8k_tool
+bash examples/gsm8k/run_grpo.sh
 ```
 
 This is the main Agent-R1 path, where `AgentEnvLoop` drives multi-step rollout and `ToolEnv` handles tool calls and environment feedback.

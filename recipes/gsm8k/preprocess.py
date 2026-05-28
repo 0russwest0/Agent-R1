@@ -1,6 +1,4 @@
 # Copyright 2024 Bytedance Ltd. and/or its affiliates
-# Copyright 2023-2024 SGLang Team
-# Copyright 2025 ModelBest Inc. and/or its affiliates
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,22 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Preprocess the GSM8k dataset to parquet format for AgentEnvLoop + ToolEnv pipeline.
-
-Based on verl/examples/data_preprocess/gsm8k_tool_agent_loop.py, adapted for
-Agent-R1's AgentEnv architecture. The key difference is that tool configuration
-is passed via the top-level ``env_kwargs`` field (consumed by AgentEnvLoop._create_env)
-instead of extra_info.tools_kwargs.
+Preprocess the GSM8k dataset to parquet format
 """
 
 import argparse
-import json
 import os
 import re
-
-import datasets
-
-from verl.utils.hdfs_io import copy, makedirs
 
 
 def extract_solution(solution_str):
@@ -41,12 +29,16 @@ def extract_solution(solution_str):
 
 
 if __name__ == "__main__":
+    import datasets
+
+    from verl.utils.hdfs_io import copy, makedirs
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--local_dir", default=None, help="The save directory for the preprocessed dataset.")
     parser.add_argument("--hdfs_dir", default=None)
     parser.add_argument("--local_dataset_path", default=None, help="The local path to the raw dataset, if it exists.")
     parser.add_argument(
-        "--local_save_dir", default="~/data/gsm8k_tool", help="The save directory for the preprocessed dataset."
+        "--local_save_dir", default="~/data/gsm8k", help="The save directory for the preprocessed dataset."
     )
 
     args = parser.parse_args()
@@ -62,8 +54,9 @@ if __name__ == "__main__":
     train_dataset = dataset["train"]
     test_dataset = dataset["test"]
 
-    instruction_following = "Let's think step by step and output the final answer after `####`."
+    instruction_following = 'Let\'s think step by step and output the final answer after "####".'
 
+    # add a row to each data item that represents a unique id
     def make_map_fn(split):
         def process_fn(example, idx):
             question_raw = example.pop("question")
@@ -74,22 +67,11 @@ if __name__ == "__main__":
             solution = extract_solution(answer_raw)
             data = {
                 "data_source": data_source,
-                "agent_name": "agent_env_loop",
                 "prompt": [
-                    {
-                        "role": "system",
-                        "content": (
-                            "You are a math expert. You are given a question and you need to solve it step by step. "
-                            "Reasoning step by step before any tool call. "
-                            "You should use the `calc_gsm8k_reward` tool after step by step solving the question, "
-                            "before generate final answer at least once and refine your answer if necessary. "
-                            "Put your final answer in the format of `#### <answer>`."
-                        ),
-                    },
                     {
                         "role": "user",
                         "content": question,
-                    },
+                    }
                 ],
                 "ability": "math",
                 "reward_model": {"style": "rule", "ground_truth": solution},
@@ -99,14 +81,6 @@ if __name__ == "__main__":
                     "answer": answer_raw,
                     "question": question_raw,
                 },
-                "env_kwargs": json.dumps(
-                    {
-                        "env_type": "tool",
-                        "tools": ["calc_gsm8k_reward"],
-                        "tool_format": "hermes",
-                        "tools_kwargs": {"ground_truth": solution},
-                    }
-                ),
             }
             return data
 
@@ -130,4 +104,5 @@ if __name__ == "__main__":
 
     if hdfs_dir is not None:
         makedirs(hdfs_dir)
+
         copy(src=local_save_dir, dst=hdfs_dir)

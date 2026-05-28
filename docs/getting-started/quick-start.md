@@ -7,7 +7,7 @@ This quick start is a **sanity check**, not the main Agent-R1 workflow. Its purp
 Use the GSM8K preprocessing script:
 
 ```bash
-python3 examples/data_preprocess/gsm8k.py --local_save_dir ~/data/gsm8k
+python3 -m recipes.gsm8k.preprocess --local_save_dir ~/data/gsm8k
 ```
 
 This produces:
@@ -20,7 +20,7 @@ This produces:
 Use the provided single-step script:
 
 ```bash
-bash examples/run_qwen2.5-3b.sh
+bash examples/gsm8k/run_ppo.sh
 ```
 
 If needed, adjust the following values before running:
@@ -29,7 +29,7 @@ If needed, adjust the following values before running:
 - `actor_rollout_ref.model.path`
 - dataset paths under `~/data/gsm8k`
 
-The script entrypoint is [`examples/run_qwen2.5-3b.sh`](https://github.com/AgentR1/Agent-R1/blob/main/examples/run_qwen2.5-3b.sh), which launches `python3 -m agent_r1.trainer.main_agent_ppo`.
+The script entrypoint is [`examples/gsm8k/run_ppo.sh`](https://github.com/AgentR1/Agent-R1/blob/main/examples/gsm8k/run_ppo.sh), which launches `python3 -m agent_r1.trainer.main_agent_ppo`.
 
 ## 3. What to Do Next
 
