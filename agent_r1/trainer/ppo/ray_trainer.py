@@ -82,6 +82,32 @@ def get_valid_data(data: DataProto) -> tuple[DataProto, torch.Tensor]:
     return valid_data, valid_mask
 
 
+def _agent_adv_estimator_key(adv_estimator: AdvantageEstimator | str) -> str:
+    """Normalize Hydra / enum values to the algorithm.adv_estimator string."""
+    if isinstance(adv_estimator, AdvantageEstimator):
+        return adv_estimator.value
+    return str(adv_estimator)
+
+
+def need_critic_agent_ppo(config) -> bool:
+    """Whether RayAgentTrainer must load a critic/value net."""
+    from verl.trainer.ppo.utils import need_critic as verl_need_critic
+
+    adv_key = _agent_adv_estimator_key(config.algorithm.adv_estimator)
+    if adv_key in ("gae", "token_gae"):
+        return True
+    return verl_need_critic(config)
+
+
+def _critic_vf_loss_response_mask(response_mask: torch.Tensor, adv_key: str) -> torch.Tensor:
+    """Return the mask used for critic value loss under each advantage estimator."""
+    if adv_key == "token_gae":
+        return response_mask.clone()
+    value_mask = torch.zeros_like(response_mask)
+    value_mask[:, 0] = 1
+    return value_mask
+
+
 def assign_global_mini_batch_ids(batch: DataProto, mini_batch_size: int, dp_size: int) -> None:
     """Assign global PPO mini-batch ids while preserving the existing DP dispatch layout."""
     if dp_size <= 0:
@@ -199,11 +225,15 @@ def build_trajectory_dump_entries(
 
 def compute_advantage(
     data: DataProto,
-    adv_estimator: AdvantageEstimator,
+    adv_estimator: AdvantageEstimator | str,
     gamma: float = 1.0,
     lam: float = 1.0,
     num_repeat: int = 1,
     norm_adv_by_std_in_grpo: bool = True,
+    gigpo_step_advantage_w: float = 1.0,
+    gigpo_mode: str = "mean_std_norm",
+    gigpo_enable_similarity: bool = False,
+    gigpo_similarity_thresh: float = 0.95,
     config: Optional[AlgoConfig] = None,
 ) -> DataProto:
     # TODO: 重写所有 core_algos 中的 advantage 函数，适配新型的 agent flow 数据结构
@@ -235,8 +265,9 @@ def compute_advantage(
 
     valid_data, valid_mask = get_valid_data(data)
 
-    # prepare response group
-    if adv_estimator == AdvantageEstimator.GAE:
+    adv_key = _agent_adv_estimator_key(adv_estimator)
+
+    if adv_key == "gae":
         # Compute advantages and returns using Generalized Advantage Estimation (GAE)
         from agent_r1.trainer.ppo.core_algos import compute_gae_advantage_return
 
@@ -251,7 +282,21 @@ def compute_advantage(
         )
         advantages[valid_mask] = valid_advantages
         returns[valid_mask] = valid_returns
-    elif adv_estimator == AdvantageEstimator.GRPO:
+    elif adv_key == "token_gae":
+        from agent_r1.trainer.ppo.core_algos import compute_token_gae_advantage_return
+
+        valid_advantages, valid_returns = compute_token_gae_advantage_return(
+            token_level_rewards=valid_data.batch["token_level_rewards"],
+            values=valid_data.batch["values"],
+            response_mask=valid_data.batch["response_mask"],
+            trajectory_uids=valid_data.non_tensor_batch["trajectory_uids"],
+            step_indices=valid_data.non_tensor_batch["step_indices"],
+            gamma=gamma,
+            lam=lam,
+        )
+        advantages[valid_mask] = valid_advantages
+        returns[valid_mask] = valid_returns
+    elif adv_key == "grpo":
         # Call compute_grpo_outcome_advantage with parameters matching its definition
         from agent_r1.trainer.ppo.core_algos import compute_grpo_outcome_advantage
 
@@ -264,6 +309,73 @@ def compute_advantage(
         )
         advantages[valid_mask] = valid_advantages
         returns[valid_mask] = valid_returns
+    elif adv_key == "reinforce_plus_plus":
+        from agent_r1.trainer.ppo.core_algos import compute_reinforce_plus_plus_outcome_advantage
+
+        valid_advantages, valid_returns = compute_reinforce_plus_plus_outcome_advantage(
+            token_level_rewards=valid_data.batch["token_level_rewards"],
+            response_mask=valid_data.batch["response_mask"],
+            gamma=gamma,
+        )
+        advantages[valid_mask] = valid_advantages
+        returns[valid_mask] = valid_returns
+    elif adv_key == "reinforce_plus_plus_baseline":
+        from agent_r1.trainer.ppo.core_algos import compute_reinforce_plus_plus_baseline_outcome_advantage
+
+        valid_advantages, valid_returns = compute_reinforce_plus_plus_baseline_outcome_advantage(
+            token_level_rewards=valid_data.batch["token_level_rewards"],
+            response_mask=valid_data.batch["response_mask"],
+            index=valid_data.non_tensor_batch["uid"],
+            trajectory_uids=valid_data.non_tensor_batch["trajectory_uids"],
+        )
+        advantages[valid_mask] = valid_advantages
+        returns[valid_mask] = valid_returns
+    elif adv_key == "rloo":
+        from agent_r1.trainer.ppo.core_algos import compute_rloo_outcome_advantage
+
+        valid_advantages, valid_returns = compute_rloo_outcome_advantage(
+            token_level_rewards=valid_data.batch["token_level_rewards"],
+            response_mask=valid_data.batch["response_mask"],
+            index=valid_data.non_tensor_batch["uid"],
+            trajectory_uids=valid_data.non_tensor_batch["trajectory_uids"],
+        )
+        advantages[valid_mask] = valid_advantages
+        returns[valid_mask] = valid_returns
+    elif adv_key == "gigpo":
+        from agent_r1.trainer.ppo.core_algos import compute_gigpo_outcome_advantage, compute_step_discounted_returns
+
+        if "anchor_obs" not in valid_data.non_tensor_batch:
+            raise KeyError(
+                "algorithm.adv_estimator='gigpo' requires non_tensor_batch['anchor_obs']. "
+                "Set step.extra_fields['anchor_obs'] in the agent flow before using GiGPO."
+            )
+        step_rewards = compute_step_discounted_returns(
+            token_level_rewards=valid_data.batch["token_level_rewards"],
+            response_mask=valid_data.batch["response_mask"],
+            trajectory_uids=valid_data.non_tensor_batch["trajectory_uids"],
+            step_indices=valid_data.non_tensor_batch["step_indices"],
+            gamma=gamma,
+        )
+        valid_advantages, valid_returns = compute_gigpo_outcome_advantage(
+            token_level_rewards=valid_data.batch["token_level_rewards"],
+            step_rewards=step_rewards,
+            response_mask=valid_data.batch["response_mask"],
+            anchor_obs=valid_data.non_tensor_batch["anchor_obs"],
+            index=valid_data.non_tensor_batch["uid"],
+            trajectory_uids=valid_data.non_tensor_batch["trajectory_uids"],
+            step_advantage_w=gigpo_step_advantage_w,
+            mode=gigpo_mode,
+            enable_similarity=gigpo_enable_similarity,
+            similarity_thresh=gigpo_similarity_thresh,
+        )
+        advantages[valid_mask] = valid_advantages
+        returns[valid_mask] = valid_returns
+    else:
+        raise ValueError(
+            f"Unsupported algorithm.adv_estimator={adv_estimator!r}. Supported: "
+            "'gae', 'token_gae', 'grpo', 'reinforce_plus_plus', "
+            "'reinforce_plus_plus_baseline', 'rloo', 'gigpo'."
+        )
 
     data.batch["advantages"] = advantages
     data.batch["returns"] = returns
@@ -281,6 +393,16 @@ class RayAgentTrainer(RayPPOTrainer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.use_reward_loop = True
+
+        adv_key = _agent_adv_estimator_key(self.config.algorithm.adv_estimator)
+        if adv_key in ("gae", "token_gae"):
+            if self.config.critic.enable is False:
+                raise ValueError(
+                    f"algorithm.adv_estimator={adv_key!r} requires a value network, but critic.enable=False."
+                )
+            if Role.Critic not in self.role_worker_mapping:
+                raise ValueError(f"algorithm.adv_estimator={adv_key!r} requires Role.Critic in role_worker_mapping.")
+            self.use_critic = True
 
     def _update_actor(self, batch: DataProto) -> DataProto:
         rollout_config = self.config.actor_rollout_ref.rollout
@@ -1005,6 +1127,14 @@ class RayAgentTrainer(RayPPOTrainer):
                             lam=self.config.algorithm.lam,
                             num_repeat=self.config.actor_rollout_ref.rollout.n,
                             norm_adv_by_std_in_grpo=norm_adv_by_std_in_grpo,
+                            gigpo_step_advantage_w=self.config.algorithm.get("gigpo", {}).get("step_advantage_w", 1.0),
+                            gigpo_mode=self.config.algorithm.get("gigpo", {}).get("mode", "mean_std_norm"),
+                            gigpo_enable_similarity=self.config.algorithm.get("gigpo", {}).get(
+                                "enable_similarity", False
+                            ),
+                            gigpo_similarity_thresh=self.config.algorithm.get("gigpo", {}).get(
+                                "similarity_thresh", 0.95
+                            ),
                             config=self.config.algorithm,
                         )
 
@@ -1013,11 +1143,8 @@ class RayAgentTrainer(RayPPOTrainer):
                         with marked_timer("update_critic", timing_raw, color="pink"):
                             # Temporarily replace response_mask for critic
                             response_mask = batch.batch["response_mask"]
-                            # For "sequence = action", the critic value used by GAE is at action start.
-                            # In `dp_critic.py`, returned `values` are sliced as `values[:, -resp_len-1:-1]`,
-                            # so index 0 corresponds to the prompt-last position (before response[0]).
-                            value_mask = torch.zeros_like(response_mask)
-                            value_mask[:, 0] = 1
+                            adv_key = _agent_adv_estimator_key(self.config.algorithm.adv_estimator)
+                            value_mask = _critic_vf_loss_response_mask(response_mask, adv_key)
                             sample_mask = batch.batch.get("sample_mask", None)
                             if sample_mask is not None:
                                 value_mask[~sample_mask.to(dtype=torch.bool)] = 0

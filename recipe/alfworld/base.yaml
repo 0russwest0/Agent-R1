@@ -1,0 +1,5 @@
+- name: alfworld_agent
+  _target_: recipe.alfworld.alfworld_agent_flow.AlfworldAgentFlow
+  max_steps: 20
+  max_parallel_calls: 1
+  max_episode_steps: 20

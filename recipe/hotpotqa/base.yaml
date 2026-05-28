@@ -1,0 +1,8 @@
+- name: hotpotqa_agent
+  _target_: recipe.hotpotqa.hotpotqa_agent_flow.HotpotQAAgentFlow
+  max_steps: 5
+  max_parallel_calls: 4
+  force_first_search: true
+
+  embedding_model_name: ${oc.env:HOTPOTQA_EMBEDDING_MODEL,BAAI/bge-large-en-v1.5}
+  embedding_devices: null

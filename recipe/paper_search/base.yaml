@@ -1,0 +1,7 @@
+- name: paper_search_agent
+  _target_: recipe.paper_search.paper_search_agent_flow.PaperSearchAgentFlow
+  max_steps: 5
+  max_parallel_calls: 5
+  search_top_k: 10
+  citations_limit: 30
+  references_limit: -1

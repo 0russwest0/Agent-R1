@@ -1,0 +1,12 @@
+# Data prep
+pandas
+pyarrow
+rank-bm25
+
+# Environment server
+fastapi
+uvicorn
+pydantic
+httpx
+thefuzz
+spacy

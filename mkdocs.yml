@@ -48,6 +48,7 @@ nav:
   - Tutorials:
       - tutorials/index.md
       - Agent Task Tutorial: tutorials/agent-task.md
+      - Datasets and Algorithms: tutorials/datasets-and-algorithms.md
 
 plugins:
   - search
