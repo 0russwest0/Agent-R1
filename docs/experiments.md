@@ -20,7 +20,7 @@ The table below reports one representative metric for each task. Agent-R1 suppor
 | ReAct | 53.1 | 25.8 | 7.14 | 2.98 | 51.58 | 23.8 |
 | GRPO | **83.3** | **59.4** | **81.29** | **74.58** | 65.83 | 44.2 |
 | PPO | 78.1 | 56.7 | 76.42 | 72.38 | **70.18** | **46.0** |
-| REINFORCE++ | 78.9 | 52.8 | 73.84 | 69.57 | 63.41 | 41.8 |
+| REINFORCE | 78.9 | 52.8 | 73.84 | 69.57 | 63.41 | 41.8 |
 | RLOO | 81.6 | 55.2 | 79.08 | 73.46 | 68.02 | 45.1 |
 
 All four RL methods outperform the training-free ReAct baseline across these settings. The best optimizer varies by task: GRPO leads on arithmetic reasoning, retrieval QA, and embodied interaction, while PPO is strongest on WebShop. This suggests that Agent-R1 is broad enough to support heterogeneous agent environments while preserving meaningful algorithm-specific behavior.
@@ -35,9 +35,9 @@ This is useful for interpreting Agent-R1 as a framework rather than a single ben
 
 ## Optimizer Comparison on GSM8K
 
-We compare PPO, GRPO, REINFORCE++, and RLOO under the same GSM8K environment, prompts, tool format, rollout configuration, and reward definition. The curves report reward, accuracy, and response length.
+We compare PPO, GRPO, REINFORCE, and RLOO under the same GSM8K environment, prompts, tool format, rollout configuration, and reward definition. The curves report reward, accuracy, and response length.
 
-Two patterns are notable. First, GRPO and RLOO reach the strongest late-stage accuracy, while PPO is more volatile. Second, REINFORCE++ behaves differently: it can reach relatively high accuracy while receiving a lower reward, which is consistent with shorter later-stage responses. Since the reward includes both answer accuracy and a format component, this indicates that high task accuracy does not necessarily mean the policy maximizes the full training signal.
+Two patterns are notable. First, GRPO and RLOO reach the strongest late-stage accuracy, while PPO is more volatile. Second, REINFORCE behaves differently: it can reach relatively high accuracy while receiving a lower reward, which is consistent with shorter later-stage responses. Since the reward includes both answer accuracy and a format component, this indicates that high task accuracy does not necessarily mean the policy maximizes the full training signal.
 
 The takeaway is that Agent-R1 does not wash out optimizer-specific behavior. It makes that behavior observable under a common interaction setup.
 

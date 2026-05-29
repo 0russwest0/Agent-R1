@@ -73,8 +73,7 @@ bash examples/hotpotqa/run_ppo.sh
 bash examples/hotpotqa/run_steppo.sh
 bash examples/hotpotqa/run_grpo.sh
 bash examples/hotpotqa/run_rloo.sh
-bash examples/hotpotqa/run_reinforce_plus_plus.sh
-bash examples/hotpotqa/run_reinforce_plus_plus_baseline.sh
+bash examples/hotpotqa/run_reinforce.sh
 bash examples/hotpotqa/run_gspo.sh
 bash examples/hotpotqa/run_gigpo.sh
 ```

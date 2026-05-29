@@ -9,8 +9,7 @@ examples/<task>/run_ppo.sh
 examples/<task>/run_steppo.sh
 examples/<task>/run_grpo.sh
 examples/<task>/run_rloo.sh
-examples/<task>/run_reinforce_plus_plus.sh
-examples/<task>/run_reinforce_plus_plus_baseline.sh
+examples/<task>/run_reinforce.sh
 examples/<task>/run_gspo.sh
 examples/<task>/run_gigpo.sh
 ```
@@ -57,8 +56,7 @@ Processed datasets are expected to be supplied by the project maintainers. Recip
 | GRPO | `run_grpo.sh` | Group-relative policy optimization baseline used as the common script base for several variants. |
 | [StepPO](https://arxiv.org/abs/2604.18401) | `run_steppo.sh` | Step-aligned policy optimization for multi-step agent trajectories. |
 | RLOO | `run_rloo.sh` | Leave-one-out baseline variant. |
-| REINFORCE++ | `run_reinforce_plus_plus.sh` | Critic-free policy-gradient variant. |
-| REINFORCE++ baseline | `run_reinforce_plus_plus_baseline.sh` | Baseline-enabled REINFORCE++ variant. |
+| REINFORCE | `run_reinforce.sh` | Step-level critic-free policy-gradient variant. |
 | GSPO | `run_gspo.sh` | GRPO-family algorithm variant exposed through script overrides. |
 | GiGPO | `run_gigpo.sh` | GRPO-family algorithm variant exposed through script overrides. |
 

@@ -106,8 +106,7 @@ bash examples/webshop/run_ppo.sh
 bash examples/webshop/run_steppo.sh
 bash examples/webshop/run_grpo.sh
 bash examples/webshop/run_rloo.sh
-bash examples/webshop/run_reinforce_plus_plus.sh
-bash examples/webshop/run_reinforce_plus_plus_baseline.sh
+bash examples/webshop/run_reinforce.sh
 bash examples/webshop/run_gspo.sh
 bash examples/webshop/run_gigpo.sh
 ```

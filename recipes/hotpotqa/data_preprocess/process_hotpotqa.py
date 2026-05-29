@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright 2025 PaperScout / recipe contributors
+# Copyright 2025 Agent-R1 Teams
 #
 # Download HotpotQA (distractor setting) and export:
 # 1) train.parquet / validation.parquet for verl/Agent-R1 RLHFDataset (prompt + reward_model + data_source)

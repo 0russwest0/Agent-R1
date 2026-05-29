@@ -9,8 +9,7 @@ examples/<task>/run_ppo.sh
 examples/<task>/run_steppo.sh
 examples/<task>/run_grpo.sh
 examples/<task>/run_rloo.sh
-examples/<task>/run_reinforce_plus_plus.sh
-examples/<task>/run_reinforce_plus_plus_baseline.sh
+examples/<task>/run_reinforce.sh
 examples/<task>/run_gspo.sh
 examples/<task>/run_gigpo.sh
 ```
@@ -57,8 +56,7 @@ recipes/<task>/
 | GRPO | `run_grpo.sh` | Group-relative policy optimization baseline，也是若干变体的通用脚本基座。 |
 | [StepPO](https://arxiv.org/abs/2604.18401) | `run_steppo.sh` | 面向多步智能体轨迹的 step-aligned policy optimization。 |
 | RLOO | `run_rloo.sh` | Leave-one-out baseline variant。 |
-| REINFORCE++ | `run_reinforce_plus_plus.sh` | Critic-free policy-gradient variant。 |
-| REINFORCE++ baseline | `run_reinforce_plus_plus_baseline.sh` | 带 baseline 的 REINFORCE++ 变体。 |
+| REINFORCE | `run_reinforce.sh` | Step-level critic-free policy-gradient variant。 |
 | GSPO | `run_gspo.sh` | 通过脚本 overrides 暴露的 GRPO-family 算法变体。 |
 | GiGPO | `run_gigpo.sh` | 通过脚本 overrides 暴露的 GRPO-family 算法变体。 |
 

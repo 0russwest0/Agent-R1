@@ -71,8 +71,7 @@ bash examples/alfworld/run_ppo.sh
 bash examples/alfworld/run_steppo.sh
 bash examples/alfworld/run_grpo.sh
 bash examples/alfworld/run_rloo.sh
-bash examples/alfworld/run_reinforce_plus_plus.sh
-bash examples/alfworld/run_reinforce_plus_plus_baseline.sh
+bash examples/alfworld/run_reinforce.sh
 bash examples/alfworld/run_gspo.sh
 bash examples/alfworld/run_gigpo.sh
 ```

@@ -1,5 +1,4 @@
-# Copyright 2024 Bytedance Ltd. and/or its affiliates
-# Copyright 2022 The HuggingFace Team. All rights reserved.
+# Copyright 2025 Agent-R1 Teams
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,12 +19,25 @@ implement PPO-like algorithms.
 
 from collections import defaultdict
 from difflib import SequenceMatcher
+from enum import Enum
 from typing import Any, Optional
 
 import numpy as np
 import torch
 
 import verl.utils.torch_functional as verl_F
+
+
+class AgentAdvantageEstimator(str, Enum):
+    """Agent-R1 advantage estimators, kept as an enum to match verl trainer style."""
+
+    GAE = "gae"
+    TOKEN_GAE = "token_gae"
+    GRPO = "grpo"
+    REINFORCE = "reinforce"
+    REMAX = "remax"
+    RLOO = "rloo"
+    GIGPO = "gigpo"
 
 
 def _to_hashable(value):
@@ -285,38 +297,28 @@ def compute_grpo_outcome_advantage(
     #   rewards across all steps in the same trajectory, then compute GRPO groupwise advantage,
     #   and finally broadcast the advantage back to every step (and token) in that trajectory.
 
-    # Step-level reward: sum of token rewards inside the step (only valid response tokens).
-    step_scores = (token_level_rewards * response_mask).sum(dim=-1)
-
-    # Accumulate trajectory-level outcome score.
-    traj2total_score: dict[object, torch.Tensor] = {}
-    traj2index: dict[object, object] = {}
-
-    id2score = defaultdict(list)
-    id2mean: dict[object, torch.Tensor] = {}
-    id2std: dict[object, torch.Tensor] = {}
-
     with torch.no_grad():
+        step_scores, traj2total_score, traj2index = _trajectory_total_scores(
+            token_level_rewards=token_level_rewards,
+            response_mask=response_mask,
+            index=index,
+            trajectory_uids=trajectory_uids,
+        )
+
+        id2score = defaultdict(list)
+        id2mean: dict[object, torch.Tensor] = {}
+        id2std: dict[object, torch.Tensor] = {}
         bsz = step_scores.shape[0]
 
-        # 1) Sum rewards across steps for each trajectory.
-        for i in range(bsz):
-            traj_uid = trajectory_uids[i]
-            if traj_uid in traj2total_score:
-                traj2total_score[traj_uid] = traj2total_score[traj_uid] + step_scores[i]
-            else:
-                traj2total_score[traj_uid] = step_scores[i]
-                traj2index[traj_uid] = index[i]
-
-        # 2) Build per-group lists over trajectories (one score per trajectory).
+        # 1) Build per-group lists over trajectories (one score per trajectory).
         for traj_uid, total_score in traj2total_score.items():
             id2score[traj2index[traj_uid]].append(total_score)
 
-        # 3) Compute per-group mean/std.
+        # 2) Compute per-group mean/std.
         for idx in id2score:
             if len(id2score[idx]) == 1:
-                id2mean[idx] = step_scores.new_tensor(0.0)
-                id2std[idx] = step_scores.new_tensor(1.0)
+                id2mean[idx] = torch.tensor(0.0)
+                id2std[idx] = torch.tensor(1.0)
             elif len(id2score[idx]) > 1:
                 scores_tensor = torch.stack(id2score[idx])
                 id2mean[idx] = torch.mean(scores_tensor)
@@ -324,7 +326,7 @@ def compute_grpo_outcome_advantage(
             else:
                 raise ValueError(f"no score in prompt index: {idx}")
 
-        # 4) Normalize to GRPO advantage per trajectory, then broadcast to steps/tokens.
+        # 3) Normalize to GRPO advantage per trajectory, then broadcast to steps/tokens.
         traj2adv: dict[object, torch.Tensor] = {}
         for traj_uid, total_score in traj2total_score.items():
             idx = traj2index[traj_uid]
@@ -342,14 +344,14 @@ def compute_grpo_outcome_advantage(
     return scores, scores
 
 
-def compute_reinforce_plus_plus_outcome_advantage(
+def compute_reinforce_outcome_advantage(
     token_level_rewards: torch.Tensor,
     response_mask: torch.Tensor,
     trajectory_uids: np.ndarray,
     step_indices: np.ndarray,
     gamma: float,
 ) -> tuple[torch.Tensor, torch.Tensor]:
-    """Compute REINFORCE++ step-discounted returns and whitened advantages."""
+    """Compute step-level REINFORCE discounted returns and whitened advantages."""
     with torch.no_grad():
         step_returns = compute_step_discounted_returns(
             token_level_rewards=token_level_rewards,
@@ -358,9 +360,11 @@ def compute_reinforce_plus_plus_outcome_advantage(
             step_indices=step_indices,
             gamma=gamma,
         )
+        step_mask = response_mask.any(dim=-1).to(dtype=response_mask.dtype).unsqueeze(-1)
+        step_advantages = verl_F.masked_whiten(step_returns.unsqueeze(-1), step_mask).squeeze(-1)
+
         returns = step_returns.unsqueeze(-1) * response_mask
-        advantages = verl_F.masked_whiten(returns, response_mask)
-        advantages = advantages * response_mask
+        advantages = step_advantages.unsqueeze(-1) * response_mask
 
     return advantages, returns
 
@@ -384,49 +388,6 @@ def _trajectory_total_scores(
             traj2index[traj_uid] = index[i]
 
     return step_scores, traj2total_score, traj2index
-
-
-def compute_reinforce_plus_plus_baseline_outcome_advantage(
-    token_level_rewards: torch.Tensor,
-    response_mask: torch.Tensor,
-    index: np.ndarray,
-    trajectory_uids: np.ndarray,
-) -> tuple[torch.Tensor, torch.Tensor]:
-    """
-    Compute RF++-baseline advantages using a per-prompt trajectory mean baseline.
-
-    Agent-R1 stores one row per agent step, so each trajectory is first reduced
-    to one outcome score, then the trajectory-level advantage is broadcast back
-    to all steps and response tokens in that trajectory.
-    """
-    with torch.no_grad():
-        step_scores, traj2total_score, traj2index = _trajectory_total_scores(
-            token_level_rewards=token_level_rewards,
-            response_mask=response_mask,
-            index=index,
-            trajectory_uids=trajectory_uids,
-        )
-
-        id2score = defaultdict(list)
-        for traj_uid, total_score in traj2total_score.items():
-            id2score[traj2index[traj_uid]].append(total_score)
-
-        id2mean: dict[object, torch.Tensor] = {}
-        for idx, scores in id2score.items():
-            id2mean[idx] = torch.mean(torch.stack(scores)) if len(scores) > 1 else step_scores.new_tensor(0.0)
-
-        traj2adv = {
-            traj_uid: total_score - id2mean[traj2index[traj_uid]] for traj_uid, total_score in traj2total_score.items()
-        }
-
-        scores = step_scores.clone()
-        for i in range(step_scores.shape[0]):
-            scores[i] = traj2adv[trajectory_uids[i]]
-
-        scores = scores.unsqueeze(-1).tile([1, response_mask.shape[-1]]) * response_mask
-        scores = verl_F.masked_whiten(scores, response_mask) * response_mask
-
-    return scores, scores
 
 
 def compute_rloo_outcome_advantage(

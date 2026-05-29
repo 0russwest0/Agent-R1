@@ -26,7 +26,7 @@ Unlike single-turn RL pipelines that treat interaction as one growing prompt-res
 - [2026.01.10] **PaperScout** is released: an autonomous academic paper search agent trained with Agent-R1 and Proximal Sequence Policy Optimization. Read the paper [here](https://arxiv.org/abs/2601.10029).
 - [2025.11.18] The Agent-R1 technical report is released on [arXiv](https://arxiv.org/abs/2511.14460).
 - [2025.05.06] Tool environments are redesigned to support more flexible agent-tool interaction patterns.
-- [2025.05.06] GRPO and REINFORCE++ training crashes caused by NaN values are fixed. See [issue #30](https://github.com/0russwest0/Agent-R1/issues/30).
+- [2025.05.06] GRPO and REINFORCE training crashes caused by NaN values are fixed. See [issue #30](https://github.com/0russwest0/Agent-R1/issues/30).
 - [2025.04.01] Basic inference scripts and an interactive chat interface are added.
 - [2025.03.18] Multi-modal support is added for vision-language model agents.
 - [2025.03.18] `verl` is moved to a git submodule and Agent-R1 extensions are separated from upstream code.
@@ -120,7 +120,7 @@ The Agent-R1 report evaluates Qwen3-4B across representative agent scenarios. Th
 | ReAct | 53.1 | 25.8 | 7.14 | 2.98 | 51.58 | 23.8 |
 | GRPO | **83.3** | **59.4** | **81.29** | **74.58** | 65.83 | 44.2 |
 | PPO | 78.1 | 56.7 | 76.42 | 72.38 | **70.18** | **46.0** |
-| REINFORCE++ | 78.9 | 52.8 | 73.84 | 69.57 | 63.41 | 41.8 |
+| REINFORCE | 78.9 | 52.8 | 73.84 | 69.57 | 63.41 | 41.8 |
 | RLOO | 81.6 | 55.2 | 79.08 | 73.46 | 68.02 | 45.1 |
 
 ## Building a New Agent Task

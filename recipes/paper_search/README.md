@@ -95,8 +95,7 @@ bash examples/paper_search/run_ppo.sh
 bash examples/paper_search/run_steppo.sh
 bash examples/paper_search/run_grpo.sh
 bash examples/paper_search/run_rloo.sh
-bash examples/paper_search/run_reinforce_plus_plus.sh
-bash examples/paper_search/run_reinforce_plus_plus_baseline.sh
+bash examples/paper_search/run_reinforce.sh
 bash examples/paper_search/run_gspo.sh
 bash examples/paper_search/run_gigpo.sh
 ```
