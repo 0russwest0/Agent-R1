@@ -16,7 +16,6 @@ Unlike single-turn RL pipelines that treat interaction as one growing prompt-res
 
 ## News
 
-- [2026.05.26] **Broader algorithm and benchmark support.** Agent-R1 now supports StepPO, RLOO, REINFORCE++ Baseline, and GiGPO in addition to GRPO, PPO, and REINFORCE++; beyond GSM8K-tool, it also includes HotpotQA, Paper Search, ALFWorld, and WebShop recipes.
 - [2026.03.23] **Agent-R1 v0.1.0 is the first official release of the refactored architecture.** It introduces the **Step-level MDP** foundation and new **Layered Abstractions**. The previous implementation is archived on the `legacy` branch.
 - [2026.03.04] **[Claw-R1](https://agentr1.github.io/Claw-R1/) is released.** It extends Agentic RL to general agents such as OpenClaw through a middleware-style design. See [AgentR1/Claw-R1](https://github.com/AgentR1/Claw-R1).
 
@@ -143,13 +142,6 @@ Typical migration checklist:
 - **Environment / tools**: define how state updates, tool observations, rewards, and termination work.
 - **Agent flow**: connect model actions to the environment loop and expose step records.
 - **Training script**: set paths, rollout steps, batch sizes, estimator, and policy loss through Hydra overrides.
-
-See:
-
-- [Step-level MDP](docs/core-concepts/step-level-mdp.md)
-- [Layered Abstractions](docs/core-concepts/layered-abstractions.md)
-- [Agent Task Tutorial](docs/tutorials/agent-task.md)
-- [Datasets and Algorithms](docs/tutorials/datasets-and-algorithms.md)
 
 ## Documentation
 
