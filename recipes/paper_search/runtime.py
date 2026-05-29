@@ -4,6 +4,7 @@ import threading
 from dataclasses import dataclass
 from typing import Any, Optional
 
+from recipes.paper_search.env.paper_client import Paper, PaperPool, PaperSearchClient, SelectorClient
 from recipes.paper_search.prompts import PAPERSEARCH_SYSTEM_PROMPT, PAPERSEARCH_USER_PROMPT, SELECT_PROMPT
 from recipes.paper_search.utils import (
     PAPER_SEARCH_TOOL_NAMES,
@@ -11,7 +12,6 @@ from recipes.paper_search.utils import (
     extract_expand_paper_id,
     extract_search_query,
 )
-from recipes.paper_search.env.paper_client import Paper, PaperPool, PaperSearchClient, SelectorClient
 
 logger = logging.getLogger(__file__)
 

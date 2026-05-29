@@ -7,10 +7,10 @@ from transformers import AutoProcessor, AutoTokenizer
 
 from agent_r1.agent_flow.agent_flow import AgentFlowBase, AgentFlowOutput, AgentFlowStep, register
 from agent_r1.reward_loop.reward_loop import RewardLoopWorker
+from recipes.paper_search.env.paper_client import PaperSearchClient, SelectorClient
 from recipes.paper_search.prompts import PAPERSEARCH_TOOL_SCHEMAS
 from recipes.paper_search.runtime import PaperSearchRuntime, PaperSearchRuntimeConfig
 from recipes.paper_search.utils import recover_tool_calls_from_text
-from recipes.paper_search.env.paper_client import PaperSearchClient, SelectorClient
 from verl.experimental.agent_loop.agent_loop import AsyncLLMServerManager, DictConfigWrap
 from verl.experimental.agent_loop.tool_parser import ToolParser
 from verl.utils.profiler import simple_timer

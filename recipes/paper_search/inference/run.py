@@ -12,8 +12,8 @@ import hydra
 from omegaconf import DictConfig, OmegaConf
 
 from recipes.paper_search.inference.agent import PaperSearchInferenceAgent
-from recipes.paper_search.inference.retrieval_client import InferencePaperClient
 from recipes.paper_search.inference.evaluation import evaluate_all_thresholds
+from recipes.paper_search.inference.retrieval_client import InferencePaperClient
 from recipes.paper_search.runtime import PaperSearchRuntimeConfig
 
 try:
@@ -90,6 +90,7 @@ def _get_thought_log_path(save_dir: Path, idx: int, sample_prefix: str) -> Path:
 def _load_engine(cfg: DictConfig) -> tuple[object, object, object]:
     from transformers import AutoTokenizer
     from vllm import LLM
+
     from verl.experimental.agent_loop.tool_parser import ToolParser
 
     model_path = str(cfg.model.path).strip()

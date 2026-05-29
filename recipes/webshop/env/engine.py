@@ -3,9 +3,14 @@ from __future__ import annotations
 import re
 from typing import Any
 
-from recipes.webshop.env.catalog import ProductIndex, normalize_options, normalize_text, product_attributes_text, product_price
+from recipes.webshop.env.catalog import (
+    ProductIndex,
+    normalize_options,
+    normalize_text,
+    product_attributes_text,
+    product_price,
+)
 from recipes.webshop.env.schemas import EnvState, StepResponse
-
 
 ACTION_RE = re.compile(r"^\s*(search|click)\[(.*)\]\s*$", re.IGNORECASE | re.DOTALL)
 PRODUCT_WINDOW = 10
@@ -26,11 +31,7 @@ def _short(text: Any, limit: int = 220) -> str:
 
 
 def render_home(goal: dict[str, Any]) -> str:
-    return (
-        "Amazon Shopping Game\n"
-        f"Instruction: {goal['instruction']}\n"
-        "You may search for products with search[query]."
-    )
+    return f"Amazon Shopping Game\nInstruction: {goal['instruction']}\nYou may search for products with search[query]."
 
 
 def _page_results(results: list[dict[str, Any]], page_num: int) -> list[dict[str, Any]]:
@@ -150,9 +151,34 @@ def _fuzzy_score(left: str, right: str) -> int:
 
 def _normalize_color(value: str) -> str:
     color_set = [
-        "beige", "black", "blue", "brown", "burgundy", "camel", "charcoal", "cream", "dark", "gold",
-        "gray", "green", "grey", "ivory", "khaki", "light", "navy", "orange", "pink", "purple",
-        "red", "silver", "tan", "taupe", "teal", "white", "wine", "yellow",
+        "beige",
+        "black",
+        "blue",
+        "brown",
+        "burgundy",
+        "camel",
+        "charcoal",
+        "cream",
+        "dark",
+        "gold",
+        "gray",
+        "green",
+        "grey",
+        "ivory",
+        "khaki",
+        "light",
+        "navy",
+        "orange",
+        "pink",
+        "purple",
+        "red",
+        "silver",
+        "tan",
+        "taupe",
+        "teal",
+        "white",
+        "wine",
+        "yellow",
     ]
     value = normalize_text(value)
     for color in color_set:
@@ -285,10 +311,7 @@ def compute_reward(index: Any, goal: dict[str, Any], state: EnvState) -> tuple[f
 
     goal_options = {normalize_text(k): normalize_text(v) for k, v in (goal.get("goal_options") or {}).items()}
     selected_options = {normalize_text(k): normalize_text(v) for k, v in state.selected_options.items()}
-    option_hits = {
-        name: selected_options.get(name) == value
-        for name, value in goal_options.items()
-    }
+    option_hits = {name: selected_options.get(name) == value for name, value in goal_options.items()}
     option_score = (sum(option_hits.values()) / len(goal_options)) if goal_options else 1.0
 
     price = product_price(item)

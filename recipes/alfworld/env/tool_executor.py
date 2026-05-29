@@ -5,7 +5,6 @@ from typing import Any
 
 from recipes.alfworld.env.alfworld_wrapper import AlfworldTextworldEnv
 
-
 INVALID_TOOL_CALL_ACTION = "<invalid_tool_call>"
 
 

@@ -17,10 +17,7 @@ from recipes.webshop.env.catalog import DEFAULT_SEED, build_goals, load_json, lo
 
 def _goal_options_for_ground_truth(goal_options: Any) -> list[dict[str, str]]:
     if isinstance(goal_options, dict):
-        return [
-            {"name": str(name), "value": str(value)}
-            for name, value in sorted(goal_options.items())
-        ]
+        return [{"name": str(name), "value": str(value)} for name, value in sorted(goal_options.items())]
     if isinstance(goal_options, list):
         out: list[dict[str, str]] = []
         for idx, value in enumerate(goal_options):
@@ -95,7 +92,9 @@ def main() -> None:
     out_dir = Path(args.output_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    train_df = pd.DataFrame([_row(goal, "train", i, dataset_mode=args.dataset_mode) for i, goal in enumerate(train_goals)])
+    train_df = pd.DataFrame(
+        [_row(goal, "train", i, dataset_mode=args.dataset_mode) for i, goal in enumerate(train_goals)]
+    )
     test_df = pd.DataFrame([_row(goal, "test", i, dataset_mode=args.dataset_mode) for i, goal in enumerate(test_goals)])
     train_df.to_parquet(out_dir / "train.parquet", index=False)
     test_df.to_parquet(out_dir / "test.parquet", index=False)

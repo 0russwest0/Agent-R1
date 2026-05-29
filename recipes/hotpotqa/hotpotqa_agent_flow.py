@@ -24,16 +24,16 @@ from transformers import AutoProcessor, AutoTokenizer
 
 from agent_r1.agent_flow.agent_flow import AgentFlowBase, AgentFlowOutput, AgentFlowStep, register
 from agent_r1.reward_loop.reward_loop import RewardLoopWorker
-from recipes.hotpotqa.prompts import (
-    HOTPOTQA_SYSTEM_PROMPT,
-    HOTPOTQA_TOOL_SCHEMAS,
-    HOTPOTQA_USER_PROMPT,
-)
 from recipes.hotpotqa.env.search_tool import (
     DEFAULT_HOTPOTQA_EMBEDDING_MODEL,
     HotpotQASearchToolLegacy,
     parse_legacy_tool_result,
     resolve_hotpotqa_embedding_devices,
+)
+from recipes.hotpotqa.prompts import (
+    HOTPOTQA_SYSTEM_PROMPT,
+    HOTPOTQA_TOOL_SCHEMAS,
+    HOTPOTQA_USER_PROMPT,
 )
 from verl.experimental.agent_loop.agent_loop import AsyncLLMServerManager, DictConfigWrap
 from verl.experimental.agent_loop.tool_parser import FunctionCall, ToolParser
@@ -250,9 +250,7 @@ class HotpotQAAgentFlow(AgentFlowBase):
         min_chars = 400
         last_ids: list[int] = []
         while True:
-            messages = self._build_messages(
-                question, passages, history_actions, fb_text, max_passage_chars=max_chars
-            )
+            messages = self._build_messages(question, passages, history_actions, fb_text, max_passage_chars=max_chars)
             last_ids = await self.apply_chat_template(messages, tools=self.tool_schemas)
             if len(last_ids) <= self.prompt_length:
                 return last_ids

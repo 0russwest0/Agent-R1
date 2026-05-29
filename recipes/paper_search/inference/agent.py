@@ -8,10 +8,10 @@ import logging
 from pathlib import Path
 from typing import Any, Optional
 
+from recipes.paper_search.env.paper_client import SelectorClient
 from recipes.paper_search.prompts import PAPERSEARCH_TOOL_SCHEMAS
 from recipes.paper_search.runtime import PaperSearchRuntime, PaperSearchRuntimeConfig
 from recipes.paper_search.utils import recover_tool_calls_from_text
-from recipes.paper_search.env.paper_client import SelectorClient
 
 
 class PaperSearchInferenceAgent:

@@ -144,11 +144,7 @@ class PaperSearchClient:
         initial_backoff: float = 0.5,
         max_backoff: float = 8.0,
     ):
-        self.base_url = (
-            base_url
-            or os.getenv("PAPER_SEARCH_BASE_URL")
-            or "http://localhost:4000"
-        ).rstrip("/")
+        self.base_url = (base_url or os.getenv("PAPER_SEARCH_BASE_URL") or "http://localhost:4000").rstrip("/")
         self.client = httpx.AsyncClient(
             base_url=self.base_url,
             timeout=httpx.Timeout(timeout, connect=10.0, pool=60.0),
@@ -263,9 +259,7 @@ class PaperSearchClient:
             return None
         return self._record_to_paper(data)
 
-    async def get_citations(
-        self, paper_id: str, limit: int = 50, fields: str = DEFAULT_PAPER_FIELDS
-    ) -> list[Paper]:
+    async def get_citations(self, paper_id: str, limit: int = 50, fields: str = DEFAULT_PAPER_FIELDS) -> list[Paper]:
         params: dict[str, Any] = {"limit": limit}
         if fields:
             params["fields"] = fields
@@ -280,9 +274,7 @@ class PaperSearchClient:
                 papers.append(self._record_to_paper(citing_paper))
         return papers
 
-    async def get_references(
-        self, paper_id: str, limit: int = 50, fields: str = DEFAULT_PAPER_FIELDS
-    ) -> list[Paper]:
+    async def get_references(self, paper_id: str, limit: int = 50, fields: str = DEFAULT_PAPER_FIELDS) -> list[Paper]:
         if limit < 0:
             limit = 99
 

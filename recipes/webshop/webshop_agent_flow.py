@@ -182,7 +182,9 @@ class WebShopAgentFlow(AgentFlowBase):
                 current_observation = build_invalid_tool_call_observation(current_observation, reason)
                 invalid_tool_call = True
                 step_reward = -self.invalid_tool_call_penalty
-                recent_history.append({"observation": observation_before_action, "action": f"INVALID_TOOL_CALL: {reason}"})
+                recent_history.append(
+                    {"observation": observation_before_action, "action": f"INVALID_TOOL_CALL: {reason}"}
+                )
                 step_info = {"error": reason, "available_actions": available_actions}
 
             reward_extra_info = {

@@ -30,9 +30,7 @@ import pandas as pd
 try:
     from datasets import load_dataset
 except ImportError as e:
-    raise SystemExit(
-        "Please install dependencies: pip install datasets pyarrow pandas"
-    ) from e
+    raise SystemExit("Please install dependencies: pip install datasets pyarrow pandas") from e
 
 
 def _row_to_agent_r1(
@@ -161,10 +159,7 @@ def _write_cross_eval_parquets(
         print(f"Loading {hf_name} / {config_name} / {split} from HuggingFace...")
         dataset = load_dataset(hf_name, config_name, split=split)
         n_rows = len(dataset) if max_samples <= 0 else min(len(dataset), max_samples)
-        rows = [
-            _cross_eval_row_to_agent_r1(dataset[i], config_name, split, i)
-            for i in range(n_rows)
-        ]
+        rows = [_cross_eval_row_to_agent_r1(dataset[i], config_name, split, i) for i in range(n_rows)]
         out_path = os.path.join(output_dir, f"{config_name}_{split}.parquet")
         pd.DataFrame(rows).to_parquet(out_path, index=False)
         print(f"Wrote {n_rows} rows -> {out_path}")

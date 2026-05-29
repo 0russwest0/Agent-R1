@@ -14,7 +14,12 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Iterator
 
-from recipes.webshop.env.catalog import DEFAULT_SEED, normalize_options, normalize_text, product_attributes_text, product_price
+from recipes.webshop.env.catalog import (
+    DEFAULT_SEED,
+    normalize_options,
+    normalize_text,
+    product_attributes_text,
+)
 
 try:
     from tqdm import tqdm
@@ -114,7 +119,9 @@ def normalize_full_product(raw: dict[str, Any], attr_record: dict[str, Any] | No
 
     pricing, price_tag = _parse_price_range(raw.get("pricing"))
     small_description = raw.get("small_description")
-    bullet_points = small_description if isinstance(small_description, list) else [small_description] if small_description else []
+    bullet_points = (
+        small_description if isinstance(small_description, list) else [small_description] if small_description else []
+    )
     options = normalize_options(raw.get("customization_options"), dedupe=True)
     attrs = list((attr_record or {}).get("attributes") or [])
 
@@ -226,7 +233,10 @@ def build_full_artifacts(
         with meta_path.open("r", encoding="utf-8") as f:
             meta = json.load(f)
         print("[WebShop full] found existing completed product store/goals/docs; reusing them.", flush=True)
-        print(f"[WebShop full] products={int(meta.get('num_products', 0)):,}, goals={int(meta.get('num_goals', 0)):,}", flush=True)
+        print(
+            f"[WebShop full] products={int(meta.get('num_products', 0)):,}, goals={int(meta.get('num_goals', 0)):,}",
+            flush=True,
+        )
         if build_lucene:
             print(f"[WebShop full] building Lucene index at {lucene_index_dir} with {threads} threads...", flush=True)
             _build_lucene_index(docs_dir=docs_dir, lucene_index_dir=lucene_index_dir, threads=threads)
@@ -329,8 +339,7 @@ def build_full_artifacts(
     with meta_path.open("w", encoding="utf-8") as f:
         json.dump(meta, f, indent=2, ensure_ascii=False)
     print(
-        "[WebShop full] product scan complete: "
-        f"raw_seen={num_raw:,}, products={num_products:,}, goals={len(goals):,}",
+        f"[WebShop full] product scan complete: raw_seen={num_raw:,}, products={num_products:,}, goals={len(goals):,}",
         flush=True,
     )
     print(f"[WebShop full] wrote SQLite: {db_path}", flush=True)

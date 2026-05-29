@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import itertools
 import json
-import math
 import os
 import pickle
 import random
@@ -12,7 +11,6 @@ from pathlib import Path
 from typing import Any
 
 from rank_bm25 import BM25Okapi
-
 
 DEFAULT_DATA_DIR = "webshop_data"
 DEFAULT_INDEX_DIR = "data/webshop/index"

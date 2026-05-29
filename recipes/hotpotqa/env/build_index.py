@@ -4,12 +4,12 @@ from __future__ import annotations
 import argparse
 import json
 import os
-from pathlib import Path
 import sys
+from pathlib import Path
 
 import faiss
-from FlagEmbedding import FlagAutoModel
 import numpy as np
+from FlagEmbedding import FlagAutoModel
 
 if __package__ is None or __package__ == "":
     sys.path.append(str(Path(__file__).resolve().parents[3]))
@@ -29,7 +29,7 @@ def _load_corpus_texts(corpus_path: Path) -> list[str]:
             if not line:
                 continue
             rec = json.loads(line)
-            corpus.append(f'{rec.get("title", "")} {rec.get("text", "")}'.strip())
+            corpus.append(f"{rec.get('title', '')} {rec.get('text', '')}".strip())
     return corpus
 
 
@@ -97,6 +97,7 @@ def main() -> None:
     index.add(vectors)
     faiss.write_index(index, str(index_path))
     print(f"[hotpotqa] saved index to {index_path}")
+
 
 if __name__ == "__main__":
     main()

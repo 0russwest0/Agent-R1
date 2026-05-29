@@ -1,15 +1,15 @@
+import json
 import logging
 import os
-from dataclasses import dataclass, field
-import json
-from pathlib import Path
-from typing import Any, List, Optional
 import threading
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Any, Optional
 
 import faiss
+import numpy as np
 import torch
 from FlagEmbedding import FlagAutoModel
-import numpy as np
 
 # Retrieval corpus root: defaults to <repo>/data/corpus/hotpotqa_corpus
 # (index.bin + hpqa_corpus.jsonl). Override with HOTPOTQA_CORPUS_DATA_ROOT.
@@ -26,11 +26,7 @@ def resolve_hotpotqa_corpus_data_root(corpus_data_dir: Optional[str] = None) -> 
     Returns:
         Absolute path containing ``index.bin`` and ``hpqa_corpus.jsonl``.
     """
-    raw = (
-        corpus_data_dir
-        or os.environ.get("HOTPOTQA_CORPUS_DATA_ROOT")
-        or str(_DEFAULT_HOTPOTQA_CORPUS_DATA_ROOT)
-    )
+    raw = corpus_data_dir or os.environ.get("HOTPOTQA_CORPUS_DATA_ROOT") or str(_DEFAULT_HOTPOTQA_CORPUS_DATA_ROOT)
     return Path(raw).expanduser().resolve()
 
 
@@ -45,8 +41,7 @@ HOTPOTQA_CORPUS_JSONL = HOTPOTQA_CORPUS_DATA_ROOT / "hpqa_corpus.jsonl"
 # Default BGE checkpoint (local dir or Hugging Face hub id). Override via YAML `embedding_model_name` or
 # `HOTPOTQA_EMBEDDING_MODEL` for portability.
 DEFAULT_HOTPOTQA_EMBEDDING_MODEL = (
-    os.environ.get("HOTPOTQA_EMBEDDING_MODEL", "BAAI/bge-large-en-v1.5").strip()
-    or "BAAI/bge-large-en-v1.5"
+    os.environ.get("HOTPOTQA_EMBEDDING_MODEL", "BAAI/bge-large-en-v1.5").strip() or "BAAI/bge-large-en-v1.5"
 )
 
 logger = logging.getLogger(__name__)
@@ -132,7 +127,7 @@ class Passage:
 
 @dataclass
 class PassagePool:
-    passages: List[Passage] = field(default_factory=list)
+    passages: list[Passage] = field(default_factory=list)
 
     def has_passage(self, pid: int) -> bool:
         return any(p.pid == pid for p in self.passages)
@@ -142,9 +137,7 @@ class PassagePool:
         if any(p.text == passage.text for p in self.passages):
             return
         pid = len(self.passages)
-        self.passages.append(
-            Passage(pid=pid, title=passage.title, text=passage.text, score=passage.score)
-        )
+        self.passages.append(Passage(pid=pid, title=passage.title, text=passage.text, score=passage.score))
 
     @property
     def passage_list(self) -> str:
@@ -190,10 +183,16 @@ class HotpotQASearchToolLegacy:
         self.corpus_path = self.data_dir / "hpqa_corpus.jsonl"
         self.embedding_model_name = embedding_model_name
         self.query_instruction = query_instruction
-        raw = (embedding_devices if embedding_devices is not None else default_hotpotqa_embedding_device()).strip() or "cpu"
+        raw = (
+            embedding_devices if embedding_devices is not None else default_hotpotqa_embedding_device()
+        ).strip() or "cpu"
         self.embedding_devices = normalize_embedding_device(raw)
         if self.embedding_devices != raw:
-            logger.info("HotpotQASearchToolLegacy: effective embedding_devices=%r (from requested %r)", self.embedding_devices, raw)
+            logger.info(
+                "HotpotQASearchToolLegacy: effective embedding_devices=%r (from requested %r)",
+                self.embedding_devices,
+                raw,
+            )
 
         self._index: Optional[faiss.Index] = None
         self._corpus: list[str] = []
@@ -324,12 +323,7 @@ class HotpotQASearchToolLegacy:
             if result < 0 or result >= len(self._corpus):
                 continue
             results_list.append(self._corpus[result])
-        if (
-            not results_list
-            and self._corpus
-            and row_ids
-            and max(row_ids) >= len(self._corpus)
-        ):
+        if not results_list and self._corpus and row_ids and max(row_ids) >= len(self._corpus):
             logger.warning(
                 "FAISS returned ids %s but corpus length is %s; dropping all hits.",
                 row_ids[:10],

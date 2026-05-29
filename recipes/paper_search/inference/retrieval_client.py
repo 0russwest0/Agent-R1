@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from typing import Optional
 
-from recipes.paper_search.inference.serper import ApiKeyPool, search_google_via_serper, serper_api_keys_from_env
 from recipes.paper_search.env.paper_client import Paper, PaperSearchClient
+from recipes.paper_search.inference.serper import ApiKeyPool, search_google_via_serper, serper_api_keys_from_env
 
 
 class InferencePaperClient:

@@ -1125,9 +1125,7 @@ class RayAgentTrainer(RayPPOTrainer):
                             lam=self.config.algorithm.lam,
                             num_repeat=self.config.actor_rollout_ref.rollout.n,
                             norm_adv_by_std_in_grpo=norm_adv_by_std_in_grpo,
-                            gigpo_step_advantage_w=self.config.algorithm.get("gigpo", {}).get(
-                                "step_advantage_w", 1.0
-                            ),
+                            gigpo_step_advantage_w=self.config.algorithm.get("gigpo", {}).get("step_advantage_w", 1.0),
                             gigpo_mode=self.config.algorithm.get("gigpo", {}).get("mode", "mean_std_norm"),
                             gigpo_enable_similarity=self.config.algorithm.get("gigpo", {}).get(
                                 "enable_similarity", False

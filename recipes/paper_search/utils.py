@@ -12,10 +12,12 @@ from typing import Any
 try:
     from verl.experimental.agent_loop.tool_parser import FunctionCall
 except ModuleNotFoundError:
+
     @dataclass
     class FunctionCall:
         name: str
         arguments: str
+
 
 logger = logging.getLogger(__name__)
 

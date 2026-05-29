@@ -24,8 +24,7 @@ class AlfworldTextworldEnv:
         game_path = self._games_root() / game_relative_path
         if not game_path.exists():
             raise FileNotFoundError(
-                f"ALFWorld game file not found: {game_path}. "
-                f"Expected runtime assets under {self._games_root()}."
+                f"ALFWorld game file not found: {game_path}. Expected runtime assets under {self._games_root()}."
             )
         return game_path
 
@@ -113,10 +112,7 @@ class AlfworldTextworldEnv:
 
     @staticmethod
     def _batch_info_to_single(info: dict[str, Any] | None) -> dict[str, Any]:
-        return {
-            key: AlfworldTextworldEnv._unwrap_batch_item(value)
-            for key, value in dict(info or {}).items()
-        }
+        return {key: AlfworldTextworldEnv._unwrap_batch_item(value) for key, value in dict(info or {}).items()}
 
     @staticmethod
     def _won_to_success(value: Any) -> bool:

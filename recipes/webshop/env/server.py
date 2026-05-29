@@ -3,8 +3,8 @@ from __future__ import annotations
 import logging
 import os
 import time
-from typing import Any
 from functools import lru_cache
+from typing import Any
 
 from fastapi import FastAPI, HTTPException
 
@@ -12,7 +12,6 @@ from recipes.webshop.env.catalog import load_product_index
 from recipes.webshop.env.engine import WebShopEngine
 from recipes.webshop.env.full_catalog import load_full_product_index
 from recipes.webshop.env.schemas import ResetRequest, ResetResponse, StepRequest, StepResponse
-
 
 TRUE_VALUES = {"1", "true", "yes", "on"}
 
@@ -43,9 +42,7 @@ def _action_type(action: str) -> str:
 
 def _click_result_count(actions: list[str]) -> int:
     return sum(
-        1
-        for action in actions
-        if action.startswith("click[") and action not in {"click[Next >]", "click[< Prev]"}
+        1 for action in actions if action.startswith("click[") and action not in {"click[Next >]", "click[< Prev]"}
     )
 
 

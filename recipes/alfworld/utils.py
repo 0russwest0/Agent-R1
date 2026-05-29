@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Any
-
 from recipes.alfworld.prompts import ALFWORLD_SYSTEM_PROMPT, ALFWORLD_USER_PROMPT
 
 
