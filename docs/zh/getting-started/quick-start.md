@@ -4,7 +4,19 @@
 
 ## 1. 准备最小数据集
 
-使用 GSM8K 数据预处理脚本：
+Agent-R1 处理好的数据集已经发布在 [ModelScope](https://www.modelscope.cn/datasets/Melmaphother/Agent-R1-data)。下载后，将 GSM8K 文件放置或软链到 `~/data/gsm8k`；也可以使用 GSM8K 数据预处理脚本在本地重新生成 sanity-check 数据：
+
+```bash
+pip install modelscope
+modelscope download --dataset Melmaphother/Agent-R1-data --local_dir data/agent-r1-data
+```
+
+也可以用 git 克隆数据集仓库：
+
+```bash
+git lfs install
+git clone https://www.modelscope.cn/datasets/Melmaphother/Agent-R1-data.git data/agent-r1-data
+```
 
 ```bash
 python3 -m recipes.gsm8k.data_preprocess.process_gsm8k --local_save_dir ~/data/gsm8k

@@ -46,7 +46,7 @@ recipes/<task>/
 | `webshop` | 购物智能体训练，包含本地 WebShop 环境服务与商品目录 artifacts。 | `data_preprocess/process_webshop.py`, `env/run_env_server.sh`, `env/full_catalog.py`, `webshop_agent_flow.py` |
 | `paper_search` | 学术论文搜索智能体，会查询 paper service、扩展 citation/reference neighborhood，并用 selector service 打分。 | `paper_search_agent_flow.py`, `runtime.py`, `env/paper_client.py`, `inference/run.py`, `inference/evaluation.py` |
 
-处理好的数据集预计由项目维护者提供。recipe 中的数据预处理脚本保留用于本地重新生成或检查数据格式。
+处理好的数据集已经发布在 [ModelScope](https://www.modelscope.cn/datasets/Melmaphother/Agent-R1-data)。下载后，将各任务文件放置或软链到对应 recipe README 中列出的路径。recipe 中的数据预处理脚本保留用于本地重新生成或检查数据格式。
 
 ## 算法
 
@@ -63,6 +63,7 @@ recipes/<task>/
 ## 从哪里开始
 
 - 使用 `recipes/<task>/README.md` 查看任务特定依赖、资源要求和环境设置。
+- 运行完整 recipe 脚本前，先从 [ModelScope](https://www.modelscope.cn/datasets/Melmaphother/Agent-R1-data) 下载处理好的数据集。
 - 使用 `examples/<task>/run_*.sh` 查看启动命令和 Hydra overrides。
 - 使用 `recipes/<task>/base.yaml` 查看 recipe-local agent 配置。
 - 只有在需要重新生成或检查数据格式时，才需要使用 `data_preprocess/process_*.py`。

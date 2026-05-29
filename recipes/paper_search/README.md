@@ -4,9 +4,7 @@
 
 This recipe trains and evaluates an academic paper-search agent. The agent uses a paper search service, expands citation/reference neighborhoods, scores discovered papers with a selector service, and optimizes for discovering relevant papers.
 
-Official background references: https://github.com/bytedance/pasa and https://arxiv.org/abs/2601.10029. The production train, test, paper-corpus, and retrieval-service assets for this repository are expected to come from the processed dataset release provided by the project maintainers.
-
-Project processed-data link: TODO(project-maintainers).
+Official background references: https://github.com/bytedance/pasa and https://arxiv.org/abs/2601.10029. Processed Agent-R1 train, test, paper-corpus, and retrieval-service assets for this recipe are available from the [Agent-R1-data ModelScope release](https://www.modelscope.cn/datasets/Melmaphother/Agent-R1-data).
 
 ## Directory Layout
 
@@ -41,7 +39,7 @@ Expected processed training files:
 - `data/pasa/train.parquet`
 - `data/pasa/test.parquet`
 
-Each parquet row should include the Agent-R1 training columns used by the rollout code: `prompt`, `reward_model`, and `extra_info`. Paper Search examples also need the query and annotated paper identifiers in `extra_info` / reward metadata according to the processed dataset release.
+Each parquet row should include the Agent-R1 training columns used by the rollout code: `prompt`, `reward_model`, and `extra_info`. Paper Search examples also need the query and annotated paper identifiers in `extra_info` / reward metadata according to the processed ModelScope release.
 
 Expected external services:
 
@@ -52,7 +50,7 @@ The paper search service must expose the search/expand API expected by `PaperSea
 
 ## Data Preparation
 
-Use the project-provided processed dataset when available. Public PaSa/PaperScout resources are background references; this repository does not currently include the final project data download link.
+Download the processed release from [ModelScope](https://www.modelscope.cn/datasets/Melmaphother/Agent-R1-data), then place or symlink the Paper Search files to the paths above. Public PaSa/PaperScout resources are background references.
 
 After placing processed files in the expected path, training scripts can consume:
 

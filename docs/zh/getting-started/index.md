@@ -5,10 +5,11 @@
 ## 本节内容
 
 - [`安装指南`](installation-guide.md)：使用官方 `verl` 环境，并确认 Agent-R1 需要继承哪些设置。
-- [`Quick Start`](quick-start.md)：准备一个小型 GSM8K 数据集，并运行单步 sanity check 脚本。
+- [`Quick Start`](quick-start.md)：下载处理好的数据集，或准备一个小型 GSM8K 数据集，并运行单步 sanity check 脚本。
 
 ## 推荐路径
 
 1. 按照 `verl` 安装指南配置环境。
-2. 运行单步 sanity check，确认模型路径、依赖与训练栈已经连通。
-3. 环境稳定后，再进入智能体任务教程。
+2. 从 [ModelScope](https://www.modelscope.cn/datasets/Melmaphother/Agent-R1-data) 下载处理好的数据集，或本地重新生成最小 GSM8K 数据用于快速检查。
+3. 运行单步 sanity check，确认模型路径、依赖与训练栈已经连通。
+4. 环境稳定后，再进入智能体任务教程。

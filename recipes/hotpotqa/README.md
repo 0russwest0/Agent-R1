@@ -4,7 +4,7 @@
 
 This recipe trains a multi-hop question-answering agent with a retrieval tool. The agent searches a FAISS index built from passage text and returns the final answer in the format expected by the HotpotQA reward function.
 
-Official dataset references: https://hotpotqa.github.io/ and https://github.com/StonyBrookNLP/musique. The production train, validation, cross-eval, and retrieval assets for this repository are expected to come from the processed dataset release provided by the project maintainers.
+Official dataset references: https://hotpotqa.github.io/ and https://github.com/StonyBrookNLP/musique. Processed Agent-R1 train, validation, cross-eval, and retrieval assets for this recipe are available from the [Agent-R1-data ModelScope release](https://www.modelscope.cn/datasets/Melmaphother/Agent-R1-data).
 
 ## Directory Layout
 
@@ -14,7 +14,7 @@ Official dataset references: https://hotpotqa.github.io/ and https://github.com/
 - `env/build_retrieval_corpus.py`: Builds retrieval corpora from local 2Wiki/MuSiQue-style raw files.
 - `env/build_index.py`: Encodes the HotpotQA corpus and builds the FAISS index.
 - `env/search_tool.py`: Runtime FAISS/BGE retrieval tool.
-- `examples/hotpotqa/*.sh`: Training launch scripts for PPO, StepPO, GRPO, RLOO, Reinforce++, GSPO, and GiGPO variants.
+- `examples/hotpotqa/*.sh`: Training launch scripts for PPO, StepPO, GRPO, RLOO, REINFORCE, GSPO, and GiGPO variants.
 
 ## Additional Requirements
 
@@ -41,7 +41,7 @@ The FAISS index is searched by `recipes.hotpotqa.env.search_tool`. The default e
 
 ## Data Preparation
 
-Use the project-provided processed dataset when available. To regenerate HotpotQA-style files from public sources for local testing:
+Download the processed release from [ModelScope](https://www.modelscope.cn/datasets/Melmaphother/Agent-R1-data), then place or symlink the HotpotQA files to the paths above. To regenerate HotpotQA-style files from public sources for local testing:
 
 ```bash
 python recipes/hotpotqa/data_preprocess/process_hotpotqa.py \

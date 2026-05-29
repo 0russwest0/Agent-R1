@@ -4,7 +4,7 @@
 
 This recipe trains an agent for ALFWorld household tasks in a TextWorld environment. The agent receives a task goal, observes admissible text actions, and executes one environment command per step.
 
-Official project reference: https://github.com/alfworld/alfworld. The production training and validation data for this repository is expected to come from the processed dataset release provided by the project maintainers.
+Official project reference: https://github.com/alfworld/alfworld. Processed Agent-R1 data for this recipe is available from the [Agent-R1-data ModelScope release](https://www.modelscope.cn/datasets/Melmaphother/Agent-R1-data).
 
 ## Directory Layout
 
@@ -16,7 +16,7 @@ Official project reference: https://github.com/alfworld/alfworld. The production
 - `prompts.py`: System prompt, user prompt, and tool schema.
 - `reward_fn.py`: Rule reward for task success.
 - `summarize_validation.py`: Utility for summarizing validation outputs.
-- `examples/alfworld/*.sh`: Training launch scripts for PPO, StepPO, GRPO, RLOO, Reinforce++, GSPO, and GiGPO variants.
+- `examples/alfworld/*.sh`: Training launch scripts for PPO, StepPO, GRPO, RLOO, REINFORCE, GSPO, and GiGPO variants.
 
 ## Additional Requirements
 
@@ -44,7 +44,7 @@ The recipe keeps the six supported ALFWorld task families used by the agent code
 
 ## Data Preparation
 
-Use the project-provided processed dataset when available. To regenerate from an official ALFWorld raw data directory for local testing:
+Download the processed release from [ModelScope](https://www.modelscope.cn/datasets/Melmaphother/Agent-R1-data), then place or symlink the ALFWorld files to the paths above. To regenerate from an official ALFWorld raw data directory for local testing:
 
 ```bash
 python recipes/alfworld/data_preprocess/process_alfworld.py \

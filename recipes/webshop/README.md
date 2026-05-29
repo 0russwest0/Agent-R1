@@ -4,7 +4,7 @@
 
 This recipe trains an agent for WebShop-style shopping tasks. The agent interacts with a local HTTP environment, searches products, clicks through product pages and options, and buys an item that satisfies the instruction.
 
-Official project reference: https://github.com/princeton-nlp/WebShop. The production product catalog, goal set, index, and processed parquet files for this repository are expected to come from the processed dataset release provided by the project maintainers.
+Official project reference: https://github.com/princeton-nlp/WebShop. Processed Agent-R1 product catalog, goal set, index, and parquet files for this recipe are available from the [Agent-R1-data ModelScope release](https://www.modelscope.cn/datasets/Melmaphother/Agent-R1-data).
 
 ## Directory Layout
 
@@ -19,7 +19,7 @@ Official project reference: https://github.com/princeton-nlp/WebShop. The produc
 - `env/run_env_server.sh`: Environment server launcher.
 - `env/build_full_artifacts.sh`: Full-mode artifact and parquet builder.
 - `prompts.py`: System prompt, user prompt, and tool schema.
-- `examples/webshop/*.sh`: Training launch scripts for PPO, StepPO, GRPO, RLOO, Reinforce++, GSPO, and GiGPO variants.
+- `examples/webshop/*.sh`: Training launch scripts for PPO, StepPO, GRPO, RLOO, REINFORCE, GSPO, and GiGPO variants.
 
 ## Additional Requirements
 
@@ -52,7 +52,7 @@ Small mode uses `webshop_data` plus a local BM25 index under `data/webshop/index
 
 ## Data Preparation
 
-Use the project-provided processed dataset when available. To regenerate full-mode artifacts from local raw WebShop files:
+Download the processed release from [ModelScope](https://www.modelscope.cn/datasets/Melmaphother/Agent-R1-data), then place or symlink the WebShop files to the paths above. To regenerate full-mode artifacts from local raw WebShop files:
 
 ```bash
 bash recipes/webshop/env/build_full_artifacts.sh

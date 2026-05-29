@@ -46,7 +46,7 @@ recipes/<task>/
 | `webshop` | Shopping-agent training with a local WebShop environment server and catalog artifacts. | `data_preprocess/process_webshop.py`, `env/run_env_server.sh`, `env/full_catalog.py`, `webshop_agent_flow.py` |
 | `paper_search` | Academic paper-search agents that query a paper service, expand citation/reference neighborhoods, and use a selector service for scoring. | `paper_search_agent_flow.py`, `runtime.py`, `env/paper_client.py`, `inference/run.py`, `inference/evaluation.py` |
 
-Processed datasets are expected to be supplied by the project maintainers. Recipe preprocessing scripts are still kept for local regeneration or format inspection when public raw data is available.
+Processed datasets are available from the Agent-R1 data release on [ModelScope](https://www.modelscope.cn/datasets/Melmaphother/Agent-R1-data). After downloading the release, place or symlink each task's files to the paths listed in its recipe README. Recipe preprocessing scripts are still kept for local regeneration or format inspection when public raw data is available.
 
 ## Algorithms
 
@@ -63,6 +63,7 @@ Processed datasets are expected to be supplied by the project maintainers. Recip
 ## Where to Start
 
 - Use `recipes/<task>/README.md` for task-specific dependencies, resource expectations, and environment setup.
+- Download processed data from [ModelScope](https://www.modelscope.cn/datasets/Melmaphother/Agent-R1-data) before running the full recipe scripts.
 - Use `examples/<task>/run_*.sh` for launch commands and Hydra overrides.
 - Use `recipes/<task>/base.yaml` to see the recipe-local agent configuration.
 - Use `data_preprocess/process_*.py` only when you need to regenerate or inspect dataset formatting.

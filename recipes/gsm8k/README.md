@@ -4,7 +4,7 @@
 
 This recipe trains math-reasoning agents on GSM8K-style grade-school word problems. It supports both a plain PPO data path and a tool-use AgentEnv path where the model can call `calc_gsm8k_reward` before producing the final answer.
 
-Official dataset reference: https://huggingface.co/datasets/openai/gsm8k. The production training data for this repository is expected to come from the processed dataset release provided by the project maintainers.
+Official dataset reference: https://huggingface.co/datasets/openai/gsm8k. Processed Agent-R1 data for this recipe is available from the [Agent-R1-data ModelScope release](https://www.modelscope.cn/datasets/Melmaphother/Agent-R1-data).
 
 ## Directory Layout
 
@@ -37,7 +37,7 @@ Each processed row follows the verl RLHFDataset style with `prompt`, `reward_mod
 
 ## Data Preparation
 
-Use the project-provided processed dataset when available. To regenerate from the public GSM8K source for local testing:
+Download the processed release from [ModelScope](https://www.modelscope.cn/datasets/Melmaphother/Agent-R1-data), then place or symlink the GSM8K files to the paths above. To regenerate from the public GSM8K source for local testing:
 
 ```bash
 python recipes/gsm8k/data_preprocess/process_gsm8k.py \

@@ -4,7 +4,19 @@ This quick start is a **sanity check**, not the main Agent-R1 workflow. Its purp
 
 ## 1. Prepare a Minimal Dataset
 
-Use the GSM8K preprocessing script:
+The processed Agent-R1 datasets are available on [ModelScope](https://www.modelscope.cn/datasets/Melmaphother/Agent-R1-data). Download the release and place or symlink the GSM8K files to `~/data/gsm8k`, or use the GSM8K preprocessing script to regenerate the sanity-check data locally:
+
+```bash
+pip install modelscope
+modelscope download --dataset Melmaphother/Agent-R1-data --local_dir data/agent-r1-data
+```
+
+You can also clone the dataset repository with git:
+
+```bash
+git lfs install
+git clone https://www.modelscope.cn/datasets/Melmaphother/Agent-R1-data.git data/agent-r1-data
+```
 
 ```bash
 python3 -m recipes.gsm8k.data_preprocess.process_gsm8k --local_save_dir ~/data/gsm8k

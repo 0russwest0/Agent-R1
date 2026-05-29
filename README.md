@@ -16,7 +16,7 @@ Unlike single-turn RL pipelines that treat interaction as one growing prompt-res
 
 ## News
 
-- [2026.05.29] **Agent-R1 integrates [StepPO](https://arxiv.org/abs/2604.18401) and expands recipe coverage.** The framework now includes StepPO-style training support together with recipe integrations for HotpotQA, ALFWorld, WebShop, and academic paper search.
+- [2026.05.29] **Agent-R1 integrates [StepPO](https://arxiv.org/abs/2604.18401), expands recipe coverage, and releases processed data.** The framework now includes StepPO-style training support together with recipe integrations for HotpotQA, ALFWorld, WebShop, and academic paper search. Processed datasets are available on [ModelScope](https://www.modelscope.cn/datasets/Melmaphother/Agent-R1-data).
 - [2026.03.23] **Agent-R1 v0.1.0 is the first official release of the refactored architecture.** It introduces the **Step-level MDP** foundation and new **Layered Abstractions**. The previous implementation is archived on the `legacy` branch.
 - [2026.03.04] **[Claw-R1](https://agentr1.github.io/Claw-R1/) is released.** It extends Agentic RL to general agents such as OpenClaw through a middleware-style design. See [AgentR1/Claw-R1](https://github.com/AgentR1/Claw-R1).
 
@@ -80,13 +80,26 @@ Agent-R1 uses the same environment setup as [verl](https://verl.readthedocs.io/e
 The recommended path is:
 
 1. Read the [Getting Started](https://agentr1.github.io/Agent-R1/getting-started/) page for the minimal setup flow.
-2. Use [`recipes/gsm8k/data_preprocess/process_gsm8k.py`](recipes/gsm8k/data_preprocess/process_gsm8k.py) and [`examples/gsm8k/run_ppo.sh`](examples/gsm8k/run_ppo.sh) as a sanity check that the environment is wired correctly.
-3. Move to the [Agent Task Tutorial](https://agentr1.github.io/Agent-R1/tutorials/agent-task/) for the main Agent-R1 workflow based on multi-step interaction and tool use.
-4. Read [Recipes and Algorithms](https://agentr1.github.io/Agent-R1/tutorials/recipes-and-algorithms/) for the current task integrations and launch-script layout.
+2. Download the processed data release from [ModelScope](https://www.modelscope.cn/datasets/Melmaphother/Agent-R1-data), then place or symlink each task's files to the paths expected by the corresponding recipe.
+3. Use [`examples/gsm8k/run_ppo.sh`](examples/gsm8k/run_ppo.sh) as a sanity check that the environment is wired correctly.
+4. Move to the [Agent Task Tutorial](https://agentr1.github.io/Agent-R1/tutorials/agent-task/) for the main Agent-R1 workflow based on multi-step interaction and tool use.
+5. Read [Recipes and Algorithms](https://agentr1.github.io/Agent-R1/tutorials/recipes-and-algorithms/) for the current task integrations and launch-script layout.
+
+Download the processed data with either the ModelScope CLI or git:
+
+```bash
+pip install modelscope
+modelscope download --dataset Melmaphother/Agent-R1-data --local_dir data/agent-r1-data
+```
+
+```bash
+git lfs install
+git clone https://www.modelscope.cn/datasets/Melmaphother/Agent-R1-data.git data/agent-r1-data
+```
 
 ### Stage 1: Sanity Check the Base Training Stack
 
-Prepare a minimal GSM8K dataset and run the single-step script:
+Use the processed GSM8K files from the data release, or regenerate a minimal GSM8K dataset locally, then run the single-step script:
 
 ```bash
 python3 -m recipes.gsm8k.data_preprocess.process_gsm8k --local_save_dir ~/data/gsm8k
@@ -97,7 +110,7 @@ This stage is only a **setup check**. It helps confirm that your environment, mo
 
 ### Stage 2: Run the Main Agent-R1 Workflow
 
-Prepare the tool-augmented dataset and launch the multi-step agent training script:
+Use the processed GSM8K agent files from the data release, or regenerate the tool-augmented dataset locally, then launch the multi-step agent training script:
 
 ```bash
 python3 -m recipes.gsm8k.data_preprocess.process_gsm8k_agent --local_save_dir ~/data/gsm8k_agent
