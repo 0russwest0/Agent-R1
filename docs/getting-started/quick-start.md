@@ -7,7 +7,7 @@ This quick start is a **sanity check**, not the main Agent-R1 workflow. Its purp
 Use the GSM8K preprocessing script:
 
 ```bash
-python3 -m recipes.gsm8k.preprocess --local_save_dir ~/data/gsm8k
+python3 -m recipes.gsm8k.data_preprocess.process_gsm8k --local_save_dir ~/data/gsm8k
 ```
 
 This produces:
@@ -36,3 +36,4 @@ The script entrypoint is [`examples/gsm8k/run_ppo.sh`](https://github.com/AgentR
 - Read [`Step-level MDP`](../core-concepts/step-level-mdp.md) to understand the main training abstraction.
 - Read [`Layered Abstractions`](../core-concepts/layered-abstractions.md) to see how `AgentFlowBase`, `AgentEnvLoop`, and `ToolEnv` fit together.
 - Continue to the [`Agent Task Tutorial`](../tutorials/agent-task.md) for the main Agent-R1 workflow based on multi-step interaction.
+- Use [`Recipes and Algorithms`](../tutorials/recipes-and-algorithms.md) to find task-specific recipes and algorithm scripts.

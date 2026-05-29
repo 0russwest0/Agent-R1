@@ -45,9 +45,15 @@ docs/
 │   ├── index.md
 │   ├── step-level-mdp.md
 │   └── layered-abstractions.md
-└── tutorials/                 # task-oriented tutorials
+├── tutorials/                 # task-oriented tutorials
+│   ├── index.md
+│   ├── agent-task.md
+│   └── recipes-and-algorithms.md
+└── zh/                        # Simplified Chinese documentation
     ├── index.md
-    └── agent-task.md
+    ├── getting-started/
+    ├── core-concepts/
+    └── tutorials/
 ```
 
 ## Writing Documentation
@@ -56,13 +62,15 @@ docs/
 
 1. Create a new `.md` file under `docs/` or one of its subdirectories.
 2. Add the page to the `nav` section in `mkdocs.yml`.
-3. Use relative links between documentation pages when possible.
+3. Add the matching Simplified Chinese page under `docs/zh/` when the page is user-facing.
+4. Use relative links between documentation pages when possible.
 
 ### Updating Existing Content
 
 - Keep the documentation lightweight and focused on the most important flows.
 - Prefer real repository scripts and examples over pseudo-code.
 - Keep environment setup guidance aligned with `verl` instead of duplicating a separate installation guide here.
+- Keep the English and Simplified Chinese pages structurally aligned so navigation and language switching remain predictable.
 
 ## Documentation Features
 
@@ -84,4 +92,4 @@ Documentation dependencies are listed in `docs/requirements.txt`:
 ## Notes
 
 - `docs/README.md` is for maintainers and is excluded from the generated site.
-- The current Agent-R1 documentation is intentionally compact and centered on the framework's core agent workflow.
+- The current Agent-R1 documentation is intentionally compact and centered on the framework's core agent workflow, recipe layout, and runnable examples.

@@ -1,6 +1,6 @@
 # Agent Task Tutorial
 
-This tutorial follows the main Agent-R1 path: a **multi-step, tool-augmented agent task** built on `AgentEnvLoop` and `ToolEnv`.
+This tutorial follows the main Agent-R1 path: a **multi-step, tool-augmented agent task** built as a recipe-local agent flow and environment.
 
 The example uses GSM8K, but the important part is not the benchmark itself. The goal is to show how Agent-R1 turns a dataset row into an environment-driven, multi-step rollout.
 
@@ -8,7 +8,7 @@ The example uses GSM8K, but the important part is not the benchmark itself. The 
 
 This tutorial uses two existing files:
 
-- dataset preprocessing: [`recipes/gsm8k/preprocess_tool.py`](https://github.com/AgentR1/Agent-R1/blob/main/recipes/gsm8k/preprocess_tool.py)
+- dataset preprocessing: [`recipes/gsm8k/data_preprocess/process_gsm8k_agent.py`](https://github.com/AgentR1/Agent-R1/blob/main/recipes/gsm8k/data_preprocess/process_gsm8k_agent.py)
 - training script: [`examples/gsm8k/run_grpo.sh`](https://github.com/AgentR1/Agent-R1/blob/main/examples/gsm8k/run_grpo.sh)
 
 ## 1. Prepare the Agent Dataset
@@ -16,18 +16,19 @@ This tutorial uses two existing files:
 Generate the tool-augmented GSM8K dataset:
 
 ```bash
-python3 -m recipes.gsm8k.preprocess_tool --local_save_dir ~/data/gsm8k_tool
+python3 -m recipes.gsm8k.data_preprocess.process_gsm8k_agent --local_save_dir ~/data/gsm8k_agent
 ```
 
-Compared with the single-step sanity-check dataset, this preprocessing script adds two fields that make the task agentic:
+Compared with the single-step sanity-check dataset, this preprocessing script keeps structured task fields for the agent path:
 
-- `agent_name: "agent_env_loop"`
-- `env_kwargs` with `env_type: "tool"` and the tool configuration
+- `agent_name: "gsm8k_agent"`
+- `question` and `ground_truth`, which let the recipe environment build prompts dynamically
+- `env_kwargs` for per-sample tool metadata such as the ground-truth answer
 
 Conceptually, each sample says:
 
-1. use the `agent_env_loop` rollout logic
-2. instantiate a `tool` environment
+1. use the recipe-local `gsm8k_agent` rollout logic
+2. instantiate the GSM8K tool environment
 3. expose the `calc_gsm8k_reward` tool inside that environment
 
 ## 2. Launch the Agent Task Training Script
@@ -41,15 +42,15 @@ bash examples/gsm8k/run_grpo.sh
 This script switches the rollout from single-step generation to the agent loop:
 
 ```bash
-actor_rollout_ref.rollout.agent.default_agent_flow=agent_env_loop \
+actor_rollout_ref.rollout.agent.default_agent_flow=gsm8k_agent \
 actor_rollout_ref.rollout.agent.max_steps=5 \
 ```
 
 It also points the trainer to the tool dataset:
 
 ```bash
-data.train_files=$HOME/data/gsm8k_tool/train.parquet \
-data.val_files=$HOME/data/gsm8k_tool/test.parquet \
+data.train_files=$HOME/data/gsm8k_agent/train.parquet \
+data.val_files=$HOME/data/gsm8k_agent/test.parquet \
 ```
 
 ## 3. What Happens During One Trajectory
@@ -58,8 +59,8 @@ At a high level, one sample follows this path:
 
 ```mermaid
 graph TD
-    datasetRow["Dataset row"] --> agentFlow["AgentEnvLoop"]
-    agentFlow --> toolEnv["ToolEnv"]
+    datasetRow["Dataset row"] --> agentFlow["GSM8KAgentFlow"]
+    agentFlow --> toolEnv["GSM8KToolEnv"]
     toolEnv --> llmStep["LLM response"]
     llmStep --> toolCall["Tool call parsing"]
     toolCall --> toolExec["BaseTool execution"]
@@ -69,9 +70,9 @@ graph TD
 
 More concretely:
 
-1. `AgentEnvLoop` reads `env_kwargs` from the dataset row.
-2. `AgentEnv.from_config(env_type="tool", ...)` creates a `ToolEnv`.
-3. `ToolEnv.reset()` starts from the sample's prompt messages.
+1. `GSM8KAgentFlow` reads recipe defaults and per-sample `env_kwargs`.
+2. `AgentEnv.from_config(env_type="gsm8k_agent", ...)` creates a `GSM8KToolEnv`.
+3. `GSM8KToolEnv.reset()` builds prompt messages from `question` and `ground_truth`.
 4. The LLM produces a response.
 5. `ToolEnv.step()` parses tool calls from the response and executes the registered tool.
 6. Tool output is appended to the conversation as the next observation.
@@ -102,3 +103,4 @@ The single-step GSM8K script is still useful, but only as a setup check. This tu
 
 - Read [`Step-level MDP`](../core-concepts/step-level-mdp.md) to connect this tutorial to the core RL formulation.
 - Read [`Layered Abstractions`](../core-concepts/layered-abstractions.md) to see why this example maps naturally to `AgentEnvLoop + ToolEnv`.
+- Read [`Recipes and Algorithms`](recipes-and-algorithms.md) to see the other task recipes and launch scripts.

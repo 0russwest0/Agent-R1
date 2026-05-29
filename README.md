@@ -16,6 +16,7 @@ Unlike single-turn RL pipelines that treat interaction as one growing prompt-res
 
 ## News
 
+- [2026.05.29] **Agent-R1 integrates [StepPO](https://arxiv.org/abs/2604.18401) and expands recipe coverage.** The framework now includes StepPO-style training support together with recipe integrations for HotpotQA, ALFWorld, WebShop, and academic paper search.
 - [2026.03.23] **Agent-R1 v0.1.0 is the first official release of the refactored architecture.** It introduces the **Step-level MDP** foundation and new **Layered Abstractions**. The previous implementation is archived on the `legacy` branch.
 - [2026.03.04] **[Claw-R1](https://agentr1.github.io/Claw-R1/) is released.** It extends Agentic RL to general agents such as OpenClaw through a middleware-style design. See [AgentR1/Claw-R1](https://github.com/AgentR1/Claw-R1).
 
@@ -79,15 +80,16 @@ Agent-R1 uses the same environment setup as [verl](https://verl.readthedocs.io/e
 The recommended path is:
 
 1. Read the [Getting Started](https://agentr1.github.io/Agent-R1/getting-started/) page for the minimal setup flow.
-2. Use [`recipes/gsm8k/preprocess.py`](recipes/gsm8k/preprocess.py) and [`examples/gsm8k/run_ppo.sh`](examples/gsm8k/run_ppo.sh) as a sanity check that the environment is wired correctly.
+2. Use [`recipes/gsm8k/data_preprocess/process_gsm8k.py`](recipes/gsm8k/data_preprocess/process_gsm8k.py) and [`examples/gsm8k/run_ppo.sh`](examples/gsm8k/run_ppo.sh) as a sanity check that the environment is wired correctly.
 3. Move to the [Agent Task Tutorial](https://agentr1.github.io/Agent-R1/tutorials/agent-task/) for the main Agent-R1 workflow based on multi-step interaction and tool use.
+4. Read [Recipes and Algorithms](https://agentr1.github.io/Agent-R1/tutorials/recipes-and-algorithms/) for the current task integrations and launch-script layout.
 
 ### Stage 1: Sanity Check the Base Training Stack
 
 Prepare a minimal GSM8K dataset and run the single-step script:
 
 ```bash
-python3 -m recipes.gsm8k.preprocess --local_save_dir ~/data/gsm8k
+python3 -m recipes.gsm8k.data_preprocess.process_gsm8k --local_save_dir ~/data/gsm8k
 bash examples/gsm8k/run_ppo.sh
 ```
 
@@ -98,11 +100,11 @@ This stage is only a **setup check**. It helps confirm that your environment, mo
 Prepare the tool-augmented dataset and launch the multi-step agent training script:
 
 ```bash
-python3 -m recipes.gsm8k.preprocess_tool --local_save_dir ~/data/gsm8k_tool
+python3 -m recipes.gsm8k.data_preprocess.process_gsm8k_agent --local_save_dir ~/data/gsm8k_agent
 bash examples/gsm8k/run_grpo.sh
 ```
 
-This is the main Agent-R1 path, where `AgentEnvLoop` drives multi-step rollout and `ToolEnv` handles tool calls and environment feedback.
+This is the main Agent-R1 path, where the recipe-local `gsm8k_agent` flow dynamically builds prompts and drives multi-step tool interaction.
 
 Core concepts:
 
@@ -126,9 +128,9 @@ The Agent-R1 report evaluates Qwen3-4B across representative agent scenarios. Th
 For a new task, keep the trainer intact and implement the task-specific layers:
 
 ```text
-recipe/<task>/
+recipes/<task>/
   base.yaml
-  prepare_<task>_agent_r1.py
+  data_preprocess/process_<task>.py
   <task>_agent_flow.py
   reward_fn.py
   prompts.py
