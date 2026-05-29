@@ -10,8 +10,10 @@ PAPERSEARCH_USER_PROMPT = """### User Query
 {paper_list}
 
 ### Instructions
-Analyze the **Paper List** and **History Actions** to determine the next set of actions. Enclose your analysis of the state and decision logic within `<analysis>...</analysis>` tags.
-**You support parallel tool calling.** You should output multiple tool calls in a single step if several independent actions are valuable at the current state.
+Analyze the **Paper List** and **History Actions** to determine the next set of actions.
+Enclose your analysis of the state and decision logic within `<analysis>...</analysis>` tags.
+**You support parallel tool calling.**
+You should output multiple tool calls in a single step if several independent actions are valuable at the current state.
 **Attend to the history actions and avoid repeating the same search query or expanding the same paper.**
 
 ### Output Format
@@ -27,7 +29,10 @@ Analyze the **Paper List** and **History Actions** to determine the next set of 
 ...
 """
 
-SELECT_PROMPT = """You are an elite researcher in the field of AI, conducting research on {user_query}. Evaluate whether the following paper fully satisfies the detailed requirements of the user query and provide your reasoning. Ensure that your decision and reasoning are consistent.
+SELECT_PROMPT = """You are an elite researcher in the field of AI, conducting research on {user_query}.
+Evaluate whether the following paper fully satisfies the detailed requirements of the user query.
+Provide your reasoning.
+Ensure that your decision and reasoning are consistent.
 
 Searched Paper:
 Title: {title}

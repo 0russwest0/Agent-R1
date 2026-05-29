@@ -20,8 +20,10 @@ WEBSHOP_USER_PROMPT = """### Shopping Instruction
 
 ### Instructions
 - Use exactly one action through the `env_step` tool.
-- The `command` must be one available action exactly, except replace `<your query>` in `search[<your query>]` with concise product keywords.
-- Click product ASINs, option values, `Description`, `Features`, `Reviews`, `Back to Search`, `Back to Item`, or `Buy Now` only when listed above.
+- The `command` must be one available action exactly, except replace `<your query>` in `search[<your query>]`
+  with concise product keywords.
+- Click product ASINs, option values, `Description`, `Features`, `Reviews`, `Back to Search`, `Back to Item`,
+  or `Buy Now` only when listed above.
 - Buy only when the selected product and options satisfy the shopping instruction.
 """
 

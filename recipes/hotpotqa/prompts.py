@@ -22,10 +22,13 @@ HOTPOTQA_USER_PROMPT = """### User Query
 {tool_feedback}
 
 ### Instructions
-Analyze the **Retrieved Passages** and **History Actions** to determine the next set of actions. Enclose your analysis of the state and decision logic within `<analysis>...</analysis>` tags.
-**You support parallel tool calling.** You should output multiple tool calls in a single step if several independent actions are valuable at the current state.
+Analyze the **Retrieved Passages** and **History Actions** to determine the next set of actions.
+Enclose your analysis of the state and decision logic within `<analysis>...</analysis>` tags.
+**You support parallel tool calling.**
+You should output multiple tool calls in a single step if several independent actions are valuable at the current state.
 **Attend to the history actions and avoid repeating the same search queries.**
-When you can answer the question from the current passages, put the short final answer inside `<answer></answer>` tags (no explanation) instead of further tool calls.
+When you can answer the question from the current passages, put the short final answer inside `<answer></answer>`
+tags (no explanation) instead of further tool calls.
 
 ### Output Format
 <analysis>

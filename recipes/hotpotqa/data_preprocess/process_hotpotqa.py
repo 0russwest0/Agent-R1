@@ -175,7 +175,7 @@ def _iter_context_paragraphs(ex: dict[str, Any]):
     if isinstance(ctx, dict) and "title" in ctx and "sentences" in ctx:
         titles = ctx["title"]
         sents_block = ctx["sentences"]
-        for title, sents in zip(titles, sents_block):
+        for title, sents in zip(titles, sents_block, strict=False):
             yield title, sents
     else:
         for item in ctx:

@@ -80,9 +80,8 @@ def main() -> None:
         if args.devices.strip():
             devices = [x.strip() for x in args.devices.split(",") if x.strip()]
             model_kwargs["devices"] = devices[0] if len(devices) == 1 else devices
-        print(
-            f"[hotpotqa] encoding corpus, n={len(corpus)}, batch_size={args.batch_size}, devices={args.devices or 'default'}"
-        )
+        device_display = args.devices or "default"
+        print(f"[hotpotqa] encoding corpus, n={len(corpus)}, batch_size={args.batch_size}, devices={device_display}")
         model = FlagAutoModel.from_finetuned(args.embedding_model, **model_kwargs)
         try:
             vectors = model.encode_corpus(corpus, batch_size=int(args.batch_size))

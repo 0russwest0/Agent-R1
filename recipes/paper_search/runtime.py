@@ -164,7 +164,7 @@ class PaperSearchRuntime:
         relevance_scores = await asyncio.gather(*tasks) if tasks else []
 
         kept_scores: list[float] = []
-        for paper, score in zip(new_papers, relevance_scores):
+        for paper, score in zip(new_papers, relevance_scores, strict=False):
             if score < 0.01:
                 continue
 
@@ -229,7 +229,7 @@ class PaperSearchRuntime:
         relevance_scores = await asyncio.gather(*tasks) if tasks else []
 
         kept_scores: list[float] = []
-        for paper, score in zip(new_papers, relevance_scores):
+        for paper, score in zip(new_papers, relevance_scores, strict=False):
             if score < 0.01:
                 continue
             with self._paper_pool_lock:

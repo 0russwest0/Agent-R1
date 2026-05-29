@@ -409,7 +409,7 @@ class HotpotQAAgentFlow(AgentFlowBase):
         """Execute multiple search queries and update state."""
         try:
             results = self.search_tool.batch_execute([{"query": q} for q in queries])
-            for query, item in zip(queries, results):
+            for query, item in zip(queries, results, strict=False):
                 self._ingest_results(query, [item], passages)
                 history_actions.append(query)
         except Exception as e:

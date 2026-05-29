@@ -284,7 +284,7 @@ class HotpotQASearchToolLegacy:
             return {"content": str(e), "success": False}
 
     def batch_execute(self, args_list: list[dict[str, Any]]) -> list[dict[str, Any]]:
-        """Same contract as Agent-R1 `SearchTool.batch_execute`: one encode + search; on failure each row gets str(e)."""
+        """Batch query with one encode/search pass, returning per-row errors on failure."""
         if not args_list:
             return []
         try:
