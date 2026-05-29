@@ -1,8 +1,8 @@
-<h1 align="center"> Agent-R1: Training Powerful LLM Agents with <br> End-to-End Reinforcement Learning </h1>
+<h1 align="center">Agent-R1: Training Powerful LLM Agents with<br>End-to-End Reinforcement Learning</h1>
 
 <p align="center">
   <a href="https://arxiv.org/abs/2511.14460"><img src="https://img.shields.io/badge/Paper-Arxiv-b31b1b?logo=arxiv&logoColor=white" alt="Paper Arxiv"></a>
-  <a href="https://agentr1.github.io/Agent-R1/"><img src="https://img.shields.io/badge/Documentation-MkDocs-526CFE?logo=materialformkdocs&logoColor=white" alt="Documentation"></a>
+  <a href="https://agentr1.github.io/agent-r1/docs/"><img src="https://img.shields.io/badge/Documentation-Agent--R1-526CFE" alt="Documentation"></a>
   <a href="https://deepwiki.com/AgentR1/Agent-R1"><img src="https://devin.ai/assets/deepwiki-badge.png" alt="Ask DeepWiki.com" height="20"/></a>
   <a href="https://github.com/AgentR1/Agent-R1/stargazers"><img src="https://img.shields.io/github/stars/AgentR1/Agent-R1" alt="GitHub Repo stars"></a>
   <a href="https://github.com/AgentR1/Agent-R1/network/members"><img src="https://img.shields.io/github/forks/AgentR1/Agent-R1" alt="GitHub forks"></a>
@@ -10,75 +10,67 @@
 
 <p align="center"><img src="./image/logo.png" width="600px" alt="Agent-R1 Logo" /></p>
 
+**Agent-R1** is a unified, modular framework for **Agentic Reinforcement Learning**. It trains multi-step LLM agents through a step-native RL loop, where the model observes an environment, generates an action, receives tool or environment feedback, and continues until the task is solved or terminated.
+
+Unlike single-turn RL pipelines that treat interaction as one growing prompt-response sequence, Agent-R1 models every turn as a **step-level MDP transition**. This makes tool use, environment state, context management, reward assignment, and policy optimization explicit parts of the same training substrate.
+
 ## News
 
-- [2026.03.23] **Agent-R1 v0.1.0 marks the first official version of the project.** It introduces a fully refactored codebase, the **Step-level MDP** foundation, and new **Layered Abstractions**. The previous version has been archived to the `legacy` branch.
-
-- [2026.03.04] **We've launched [Claw-R1](https://agentr1.github.io/Claw-R1/)**, a more advanced framework designed to empower General Agents (OpenClaw etc.) with Agentic RL through a Middleware design. Check it out at [AgentR1/Claw-R1](https://github.com/AgentR1/Claw-R1).
+- [2026.03.23] **Agent-R1 v0.1.0 is the first official release of the refactored architecture.** It introduces the **Step-level MDP** foundation and new **Layered Abstractions**. The previous implementation is archived on the `legacy` branch.
+- [2026.03.04] **[Claw-R1](https://agentr1.github.io/Claw-R1/) is released.** It extends Agentic RL to general agents such as OpenClaw through a middleware-style design. See [AgentR1/Claw-R1](https://github.com/AgentR1/Claw-R1).
 
 <details>
 <summary><b>Earlier Updates</b></summary>
 
-
-
-- [2026.01.10] **New Application Released**: We are excited to introduce **PaperScout**, an autonomous agent for academic paper search trained using Agent-R1. It introduces a novel *Proximal Sequence Policy Optimization (PSPO)* method. Read the paper [here](https://arxiv.org/abs/2601.10029).
-
-- [2025.11.18] **Technical Report**: We have released the technical report on arXiv. Read the paper [here](https://arxiv.org/abs/2511.14460).
-
-- [2025.05.06] **Tool Environment Redesign**: Completely redesigned and abstracted tool environments to support more flexible and diverse agent-tool interactions patterns.
-
-- [2025.05.06] **Critical Bug Fixes**: Fixed GRPO and Reinforce++ training crash issues that were causing NaN values during training. See [issue #30](https://github.com/0russwest0/Agent-R1/issues/30) for details.
-
-- [2025.05.06] **New Tutorials**: Added comprehensive tutorials for creating custom tools and tool environments, including the first open-source runnable implementation of ReTool.
-
-
-- [2025.04.01] Added basic **inference scripts** and a simple interactive chat interface. You can now easily deploy and interact with your trained models. See [inference guide](docs/inference/inference.md) for details.
-
-- [2025.03.18] Added comprehensive **multi-modal support**! Agent-R1 now seamlessly integrates with vision-language models (VLMs), enabling agents to process and reason with both text and visual inputs in rich multi-modal environments.
-
-- [2025.03.18] Refactored our codebase to improve maintainability! We've converted verl from a static folder to a **git submodule** and separated our custom code extensions. This makes it easier to update `verl` and understand the project structure.
-
-  > **Important:** After pulling this update, you'll need to reinitialize your environment. Run `git submodule update --init --recursive` and reinstall verl locally from this directory.
-
-- [2025.03.16] Added support for **process rewards**! You can now assign rewards for each tool call based on its effectiveness. To balance process rewards with outcome rewards, we implemented reward normalization inspired by [PRIME](https://github.com/PRIME-RL/PRIME).
+- [2026.01.10] **PaperScout** is released: an autonomous academic paper search agent trained with Agent-R1 and Proximal Sequence Policy Optimization. Read the paper [here](https://arxiv.org/abs/2601.10029).
+- [2025.11.18] The Agent-R1 technical report is released on [arXiv](https://arxiv.org/abs/2511.14460).
+- [2025.05.06] Tool environments are redesigned to support more flexible agent-tool interaction patterns.
+- [2025.05.06] GRPO and REINFORCE++ training crashes caused by NaN values are fixed. See [issue #30](https://github.com/0russwest0/Agent-R1/issues/30).
+- [2025.04.01] Basic inference scripts and an interactive chat interface are added.
+- [2025.03.18] Multi-modal support is added for vision-language model agents.
+- [2025.03.18] `verl` is moved to a git submodule and Agent-R1 extensions are separated from upstream code.
+- [2025.03.16] Process rewards are supported for per-tool-call feedback.
 
 </details>
 
-## Overview
+## Why Agent-R1
 
-**Agent-R1** is an open-source framework for training powerful language **agents** with **end-to-end reinforcement learning**. It is designed for **multi-step agent tasks**, where the model interacts with environments and tools across multiple rounds instead of producing a single final answer.
+Modern LLM infrastructure already has strong serving systems such as vLLM and SGLang, and strong distributed training systems such as DeepSpeed, FSDP, and Megatron-LM. Agentic RL needs to reconnect these two sides into a **rollout -> reward -> replay -> update** loop where the model interacts with tools and environments over multiple turns.
 
-The core idea behind Agent-R1 is **Step-level MDP**: each interaction step is treated as a proper RL transition, with an environment-defined state, an LLM action, and the next observation produced by the environment. This replaces the usual "append everything into one ever-growing token sequence" view with a more principled and more flexible training abstraction.
+Agent-R1 is built around three design goals:
 
-With Agent-R1, you can build custom agent workflows, define interactive environments and tools, and train multi-step agents in a unified RL pipeline.
-
-> **Also check out [Awesome-Agent-RL](https://github.com/0russwest0/Awesome-Agent-RL)**: Our curated collection of papers and resources on unlocking the potential of Agents through Reinforcement Learning.
+- **Step-level trajectory representation**: each transition stores observation, action, environment feedback, reward, termination state, and next observation while preserving action boundaries and avoiding fragile `Token -> Text -> Token` reconstruction.
+- **Flexible context management**: the environment decides what the model sees next, so history can be appended, truncated, summarized, rewritten, or augmented.
+- **Algorithm-system decoupling**: task workflows, environments, rollout, rewards, advantage estimators, and policy objectives can evolve independently.
 
 <p align="center"><img src="./image/framework.png" width="800px" alt="Agent-R1 Framework" /></p>
 
-## Why Agent-R1 v0.1.0
+## Core Idea: Step-level MDP
 
-Agent-R1 v0.1.0 is the first official release of the new architecture. It is built to address two common failure modes in RL training for LLM agents:
+In multi-turn agent training, the model is not just continuing a token sequence. Each model output can invoke tools, change the environment state, receive external feedback, and shape the next observation. Agent-R1 therefore treats the **agent step** as the basic interaction unit: a step records what the model saw, what action it produced, what feedback and reward the environment returned, and what observation should be exposed next. This step-level trajectory representation keeps rollout, replay, context construction, and credit assignment aligned with real agent decisions, while still allowing token-level policy losses inside each generated action.
 
-- **Retokenization drift in text-based pipelines**: if rollout data is collected as text and later tokenized again for training, the `Token -> Text -> Token` conversion is not reversible.
-- **Rigid token-only trajectory construction**: if the whole interaction is represented as a single growing token list, context handling becomes hard-wired to simple append-only logic.
+<p align="center"><img src="./image/step-level-mdp.png" width="800px" alt="Step-level MDP" /></p>
 
-Agent-R1 addresses these issues with a **step-level trajectory representation**:
+## Architecture
 
-- each step stores its own prompt and response
-- the environment, not raw token concatenation, controls the next observation
-- context can be **truncated**, **summarized**, **rewritten**, or **augmented** between steps
-- standard RL loops such as `obs -> action -> step -> next_obs` map naturally onto agent training
+Agent-R1 uses layered abstractions so new tasks can reuse the same trainer without rewriting the full RL stack.
 
-This makes Agent-R1 a better fit for real multi-step agent tasks with tool use, environment feedback, and flexible context management.
+| Layer | Responsibility | When to Use |
+|---|---|---|
+| `AgentFlowBase` | Full control over prompt construction, model calls, and step assembly. | Custom workflows or experimental agent logic. |
+| `AgentEnvLoop` | The main multi-step loop connecting model generation with environment `reset()` / `step()`. | Most agentic RL tasks. |
+| `AgentEnv` | Task environment interface returning observations, rewards, termination, and metadata. | When your task has state transitions. |
+| `ToolEnv` | Built-in environment for parsing tool calls, executing tools, and feeding observations back. | Tool-augmented tasks such as GSM8K-tool. |
+| `BaseTool` | Standard interface for registering executable tools. | Adding calculators, search tools, APIs, or task-specific checkers. |
 
-## Version Guide
+The main loop is:
 
-- The default [`main`](https://github.com/AgentR1/Agent-R1/tree/main) branch contains the new **v0.1.0** architecture based on **Step-level MDP** and **Layered Abstractions**.
-- The previous implementation is preserved in the [`legacy`](https://github.com/AgentR1/Agent-R1/tree/legacy) branch for reference.
-- The current version uses the same runtime environment as `verl` and requires **`verl==0.7.0`**.
-
-
+1. Load a sample containing `prompt`, `agent_name`, `reward_model`, and optional `env_kwargs`.
+2. Create the configured `AgentFlow` and environment.
+3. Generate an action from the current observation.
+4. Parse the action, execute tools or update the environment, and return feedback.
+5. Record the step and continue until `done=True` or `max_steps` is reached.
+6. Convert the structured trace into rewards, advantages, masks, and policy updates.
 
 ## Getting Started
 
@@ -117,18 +109,61 @@ Core concepts:
 - [Step-level MDP](https://agentr1.github.io/Agent-R1/core-concepts/step-level-mdp/)
 - [Layered Abstractions](https://agentr1.github.io/Agent-R1/core-concepts/layered-abstractions/)
 
+## Experimental Snapshot
+
+The Agent-R1 report evaluates Qwen3-4B across representative agent scenarios. The table below summarizes the main results; see [Experiments](docs/experiments.md) for the experimental setting, task coverage, optimizer comparison, and context-management analysis.
+
+| Method | GSM8K Acc. (%) | HotpotQA Acc. (%) | ALFWorld SR Seen (%) | ALFWorld SR Unseen (%) | WebShop Score (%) | WebShop SR (%) |
+|---|---:|---:|---:|---:|---:|---:|
+| ReAct | 53.1 | 25.8 | 7.14 | 2.98 | 51.58 | 23.8 |
+| GRPO | **83.3** | **59.4** | **81.29** | **74.58** | 65.83 | 44.2 |
+| PPO | 78.1 | 56.7 | 76.42 | 72.38 | **70.18** | **46.0** |
+| REINFORCE++ | 78.9 | 52.8 | 73.84 | 69.57 | 63.41 | 41.8 |
+| RLOO | 81.6 | 55.2 | 79.08 | 73.46 | 68.02 | 45.1 |
+
+## Building a New Agent Task
+
+For a new task, keep the trainer intact and implement the task-specific layers:
+
+```text
+recipe/<task>/
+  base.yaml
+  prepare_<task>_agent_r1.py
+  <task>_agent_flow.py
+  reward_fn.py
+  prompts.py
+  utils.py
+  env/                       # optional environment service or wrappers
+```
+
+Typical migration checklist:
+
+- **Data**: emit parquet rows with `prompt`, `reward_model`, `agent_name`, and `env_kwargs`.
+- **Environment / tools**: define how state updates, tool observations, rewards, and termination work.
+- **Agent flow**: connect model actions to the environment loop and expose step records.
+- **Training script**: set paths, rollout steps, batch sizes, estimator, and policy loss through Hydra overrides.
+
+## Documentation
+
+- Project homepage: [https://agentr1.github.io/agent-r1](https://agentr1.github.io/agent-r1)
+- Documentation: [https://agentr1.github.io/agent-r1/docs/](https://agentr1.github.io/agent-r1/docs/)
+
+## Version Guide
+
+- `main` contains the current v0.1.0 architecture based on Step-level MDP and layered abstractions.
+- `legacy` preserves the previous implementation for reference.
+- Use a recent source checkout of `verl` that includes the AgentFlow / async rollout stack required by this repository.
+
 ## Awesome Projects Using Agent-R1
 
-Here are some representative projects built on top of Agent-R1:
+- **[TableMind](https://arxiv.org/abs/2509.06278)**: an autonomous programmatic agent for tool-augmented table reasoning.
+- **[PaperScout](https://arxiv.org/abs/2601.10029)**: an autonomous academic paper search agent trained with Agent-R1 and Proximal Sequence Policy Optimization.
+- **[Cast-R1](https://arxiv.org/abs/2602.13802)**: an agentic framework that reformulates time-series forecasting as sequential decision making.
+- **[StepPO](https://arxiv.org/abs/2604.18401)**: Step-Aligned Policy Optimization for Agentic Reinforcement Learning, a step-level Agentic RL method that treats the agent step as the action unit and aligns credit assignment with multi-turn agent decisions.
 
-- **[TableMind](https://arxiv.org/abs/2509.06278)**: An autonomous programmatic agent for tool-augmented table reasoning. TableMind is built upon the Agent-R1 framework and leverages its end-to-end reinforcement learning pipeline to train a specialized agent for structured table understanding.
-- **[PaperScout](https://arxiv.org/abs/2601.10029)**: An autonomous agent for academic paper search built with Agent-R1. It introduces Proximal Sequence Policy Optimization (PSPO), a process-aware method for aligning token-level optimization with sequence-level agent interactions.
-- **[Cast-R1](https://arxiv.org/abs/2602.13802)**: A learned agentic framework that reformulates time series forecasting as a sequential decision-making problem. Built upon Agent-R1, it features a memory-based state management mechanism and a tool-augmented workflow, trained via a two-stage strategy combining supervised fine-tuning with multi-turn reinforcement learning to autonomously gather evidence, reason, and iteratively refine forecasts.
-
-  
 ## Acknowledgements
 
-This work is conducted at the **State Key Laboratory of Cognitive Intelligence, USTC**. We gratefully acknowledge the inspiring ideas and early insights from [DeepSeek-R1](https://github.com/deepseek-ai/DeepSeek-R1), [veRL](https://github.com/volcengine/verl), and [RAGEN](https://github.com/ZihanWang314/ragen), which have significantly influenced the development of Agent-R1. We also sincerely thank [**Prof. Qi Liu**](http://staff.ustc.edu.cn/~qiliuql/) and [**Prof. Mingyue Cheng**](https://mingyue-cheng.github.io/) for their guidance and support.
+This work is conducted at the **State Key Laboratory of Cognitive Intelligence, USTC**. We gratefully acknowledge the ideas and infrastructure from [DeepSeek-R1](https://github.com/deepseek-ai/DeepSeek-R1), [veRL](https://github.com/volcengine/verl), and [RAGEN](https://github.com/ZihanWang314/ragen). We also thank [Prof. Qi Liu](http://staff.ustc.edu.cn/~qiliuql/) and [Prof. Mingyue Cheng](https://mingyue-cheng.github.io/) for their guidance and support.
 
 ## Citation
 
