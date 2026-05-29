@@ -13,9 +13,9 @@ Project processed-data link: TODO(project-maintainers).
 - `base.yaml`: Paper Search training agent configuration.
 - `paper_search_agent_flow.py`: Agent-R1 rollout loop for training.
 - `runtime.py`: Shared agent runtime for training and inference.
+- `utils.py`: Tool-call parsing helpers.
 - `env/paper_client.py`: Paper search and selector clients.
 - `env/http_retry.py`: Shared HTTP retry helper.
-- `tool_utils.py`: Tool-call parsing and paper-pool helpers.
 - `prompts.py`: System prompt, user prompt, selector prompt, and tool schema.
 - `env/run_papersearch_selector_service.sh`: vLLM selector service launcher.
 - `inference/default.yaml`: Hydra config for offline inference and evaluation.
@@ -32,7 +32,7 @@ Install recipe-specific extras after setting up the base Agent-R1 / verl environ
 pip install -r recipes/paper_search/requirements.txt
 ```
 
-The selector service and inference path require GPU resources suitable for the selected vLLM model.
+The selector service and inference path require GPU resources suitable for the selected vLLM model. vLLM is expected to come from the base Agent-R1 training environment rather than this recipe-specific requirements file.
 
 ## Data And Resources
 
@@ -106,14 +106,14 @@ Scripts accept trailing Hydra overrides through `"$@"`.
 ## Core Code Entry Points
 
 - Training rollout loop: `recipes/paper_search/paper_search_agent_flow.py`.
-- Shared runtime: `recipes/paper_search/runtime.py`.
+- Shared runtime and online step reward: `recipes/paper_search/runtime.py`.
 - Search and selector clients: `recipes/paper_search/env/paper_client.py`.
 - Inference runner: `recipes/paper_search/inference/run.py`.
 - Evaluation: `recipes/paper_search/inference/evaluation.py`.
 
 ## Outputs And Evaluation
 
-Training uses selector-scored discovered papers as reward evidence. Inference writes sample outputs under `PAPERSEARCH_INFER_OUTPUT_DIR`, default `results/paper_search/inference`.
+Training uses selector-scored discovered papers as reward evidence. Paper Search does not use a separate `reward_fn.py`; `PaperSearchRuntime.search` and `PaperSearchRuntime.expand` compute online step rewards, and `PaperSearchAgentFlow` writes those values directly into `AgentFlowStep.reward_score`. Inference writes sample outputs under `PAPERSEARCH_INFER_OUTPUT_DIR`, default `results/paper_search/inference`.
 
 When `evaluation.enabled=true`, inference also writes `evaluation.json` with threshold results for `0.0` through `0.9` and the configured `top_k_values`.
 

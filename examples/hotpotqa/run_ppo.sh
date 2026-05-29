@@ -55,7 +55,7 @@ build_val_files() {
 VAL_FILES="$(build_val_files)"
 
 PROJECT_NAME='HotpotQA_AGENT_R1'
-EXP_NAME='hotpotqa_ppo'
+EXP_NAME="${EXP_NAME:-hotpotqa_ppo}"
 
 python3 -m agent_r1.trainer.main_agent_ppo \
     algorithm.adv_estimator=gae \

@@ -32,7 +32,7 @@ WEBSHOP_VAL_PATH="${WEBSHOP_VAL_PATH:-$WEBSHOP_DATA_ROOT/test.parquet}"
 VAL_DUMP_DIR="${WEBSHOP_VAL_DUMP_DIR:-$PROJECT_DIR/outputs/webshop_validation/ppo}"
 
 PROJECT_NAME="${PROJECT_NAME:-WebShop_AGENT_R1}"
-EXP_NAME="${EXP_NAME:-webshop_ppo_mlflow_4gpu}"
+EXP_NAME="${EXP_NAME:-webshop_ppo}"
 
 python3 -m agent_r1.trainer.main_agent_ppo \
     algorithm.adv_estimator=gae \

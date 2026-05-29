@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from typing import Any, Optional
 
 from recipes.paper_search.prompts import PAPERSEARCH_SYSTEM_PROMPT, PAPERSEARCH_USER_PROMPT, SELECT_PROMPT
-from recipes.paper_search.tool_utils import (
+from recipes.paper_search.utils import (
     PAPER_SEARCH_TOOL_NAMES,
     decode_tool_arguments,
     extract_expand_paper_id,

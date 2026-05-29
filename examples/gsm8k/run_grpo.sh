@@ -8,6 +8,7 @@ export CUDA_HOME=/usr/local/cuda
 
 PROJECT_DIR="$(pwd)"
 CONFIG_PATH="$PROJECT_DIR/recipes/gsm8k/base.yaml"
+EXP_NAME="${EXP_NAME:-gsm8k_agent_grpo}"
 
 python3 -m agent_r1.trainer.main_agent_ppo \
     algorithm.adv_estimator=grpo \
@@ -49,7 +50,7 @@ python3 -m agent_r1.trainer.main_agent_ppo \
     custom_reward_function.path=recipes/gsm8k/reward_fn.py \
     custom_reward_function.name=compute_score \
     trainer.project_name='agent_r1_gsm8k_agent' \
-    trainer.experiment_name='qwen3_4b_gsm8k_agent' \
+    trainer.experiment_name="$EXP_NAME" \
     trainer.n_gpus_per_node=2 \
     trainer.nnodes=1 \
     trainer.save_freq=-1 \

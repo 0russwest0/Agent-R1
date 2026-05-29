@@ -32,7 +32,7 @@ PAPERSEARCH_VAL_PATH="${PAPERSEARCH_VAL_PATH:-$PROJECT_DIR/data/pasa/test.parque
 export PAPERSEARCH_SELECTOR_MODEL_NAME=${PAPERSEARCH_SELECTOR_MODEL_NAME:-selector-qwen-8b}
 
 PROJECT_NAME=${PROJECT_NAME:-FALCON}
-EXP_NAME=${EXP_NAME:-papersearch_ppo_mlflow_4gpu}
+EXP_NAME=${EXP_NAME:-papersearch_ppo}
 
 python3 -m agent_r1.trainer.main_agent_ppo \
     algorithm.adv_estimator=gae \

@@ -5,6 +5,7 @@ export CUDA_VISIBLE_DEVICES=0,1
 export VLLM_USE_V1=1
 export HF_ENDPOINT=https://hf-mirror.com
 export CUDA_HOME=/usr/local/cuda
+EXP_NAME="${EXP_NAME:-gsm8k_ppo}"
 
 python3 -m agent_r1.trainer.main_agent_ppo \
     algorithm.adv_estimator=gae \
@@ -41,7 +42,7 @@ python3 -m agent_r1.trainer.main_agent_ppo \
     trainer.critic_warmup=0 \
     trainer.logger='["console"]' \
     trainer.project_name='agent_r1_gsm8k' \
-    trainer.experiment_name='qwen2_5_3b_ppo' \
+    trainer.experiment_name="$EXP_NAME" \
     trainer.n_gpus_per_node=2 \
     trainer.nnodes=1 \
     trainer.save_freq=-1 \

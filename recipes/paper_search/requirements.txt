@@ -4,6 +4,5 @@ pydantic
 numpy
 hydra-core
 omegaconf
-vllm
 tqdm
 python-dotenv
