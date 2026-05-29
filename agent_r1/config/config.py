@@ -80,20 +80,21 @@ class BaseModelConfig(BaseConfig):
 
 @dataclass
 class AgentFlowConfig(BaseConfig):
-    """AgentFlow 配置，兼容 verl 的 AgentLoopConfig 字段。
+    """AgentFlow config compatible with verl's AgentLoopConfig fields.
 
-    agent_r1 使用 agent_flow 命名，但同时接受 verl 的 agent_loop 字段以便配置合并。
+    agent_r1 uses agent_flow naming while accepting verl's agent_loop fields
+    for config merging.
     """
 
     num_workers: int = 8
 
-    # agent_r1 字段
+    # agent_r1 fields
     default_agent_flow: str = "single_step_agent"
     agent_flow_config_path: Optional[str] = None
     max_steps: int = 10
     skip_special_tokens: bool = True
 
-    # 兼容 verl 的旧字段（接受但忽略）
+    # Legacy verl fields accepted for compatibility but ignored.
     default_agent_loop: Optional[str] = None
     agent_loop_config_path: Optional[str] = None
 

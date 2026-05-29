@@ -225,9 +225,9 @@ def compute_advantage(
     norm_adv_by_std_in_grpo: bool = True,
     config: Optional[AlgoConfig] = None,
 ) -> DataProto:
-    # TODO: 重写所有 core_algos 中的 advantage 函数，适配新型的 agent flow 数据结构
-    # 多行 data 对应一条完整轨迹，通过 non_tensor_batch["trajectory_uids"] 来区分不同轨迹，每条轨迹包含多行 data。
-    # 通过 non_tensor_batch["step_indices"] 来区分同一条轨迹内的不同 step 的顺序。
+    # TODO: Refactor all advantage functions in core_algos to support the agent flow data structure.
+    # Multiple data rows can form one complete trajectory, distinguished by non_tensor_batch["trajectory_uids"].
+    # non_tensor_batch["step_indices"] stores the step order within the same trajectory.
     """Compute advantage estimates for policy optimization.
 
     This function computes advantage estimates using various estimators like GAE, GRPO, REINFORCE, etc.
