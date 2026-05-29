@@ -1,4 +1,6 @@
-# HotpotQA FAISS search tool + BGE embeddings (recipes/hotpotqa/utils.py)
+# Recipe-specific extras for HotpotQA. This is not a full Agent-R1 environment lock file.
+datasets
+pandas
+pyarrow
 faiss-cpu>=1.7.4
 FlagEmbedding>=1.2.0
-# Data prep (recipes/hotpotqa/prepare_hotpotqa.py): datasets, pyarrow, pandas

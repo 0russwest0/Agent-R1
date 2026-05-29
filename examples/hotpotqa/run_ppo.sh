@@ -8,7 +8,7 @@ export HYDRA_FULL_ERROR=1
 export MLFLOW_TRACKING_URI=${MLFLOW_TRACKING_URI:-http://172.17.0.1:5000}
 
 PROJECT_DIR="$(pwd)"
-CONFIG_PATH="$PROJECT_DIR/recipes/hotpotqa/base_faiss_cpu.yaml"
+CONFIG_PATH="$PROJECT_DIR/recipes/hotpotqa/base.yaml"
 export HOTPOTQA_DATA_ROOT="${HOTPOTQA_DATA_ROOT:-$PROJECT_DIR/data/corpus/hotpotqa}"
 
 HOTPOTQA_MODEL_PATH=${HOTPOTQA_MODEL_PATH:-Qwen/Qwen3-4B-Instruct-2507}

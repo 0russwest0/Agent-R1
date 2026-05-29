@@ -14,17 +14,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Preprocess the GSM8k dataset to parquet format for AgentEnvLoop + ToolEnv pipeline.
+Preprocess the GSM8k dataset to parquet format for the GSM8K agent pipeline.
 
-Adapted for Agent-R1's AgentEnv architecture. The key difference is that tool
-configuration is passed via the top-level ``env_kwargs`` field (consumed by
-AgentEnvLoop._create_env) instead of extra_info.tools_kwargs.
+The output keeps task fields structured so the recipe-local GSM8K environment
+can build prompts dynamically at rollout time.
 """
 
 import argparse
 import json
 import os
 import re
+import sys
+from pathlib import Path
+
+if __package__ is None or __package__ == "":
+    sys.path.append(str(Path(__file__).resolve().parents[3]))
+
+from recipes.gsm8k.prompts import build_plain_messages
 
 
 def extract_solution(solution_str):
@@ -45,7 +51,7 @@ if __name__ == "__main__":
     parser.add_argument("--hdfs_dir", default=None)
     parser.add_argument("--local_dataset_path", default=None, help="The local path to the raw dataset, if it exists.")
     parser.add_argument(
-        "--local_save_dir", default="~/data/gsm8k_tool", help="The save directory for the preprocessed dataset."
+        "--local_save_dir", default="~/data/gsm8k_agent", help="The save directory for the preprocessed dataset."
     )
 
     args = parser.parse_args()
@@ -61,35 +67,17 @@ if __name__ == "__main__":
     train_dataset = dataset["train"]
     test_dataset = dataset["test"]
 
-    instruction_following = "Let's think step by step and output the final answer after `####`."
-
     def make_map_fn(split):
         def process_fn(example, idx):
             question_raw = example.pop("question")
-
-            question = question_raw + " " + instruction_following
-
             answer_raw = example.pop("answer")
             solution = extract_solution(answer_raw)
             data = {
                 "data_source": data_source,
-                "agent_name": "agent_env_loop",
-                "prompt": [
-                    {
-                        "role": "system",
-                        "content": (
-                            "You are a math expert. You are given a question and you need to solve it step by step. "
-                            "Reasoning step by step before any tool call. "
-                            "You should use the `calc_gsm8k_reward` tool after step by step solving the question, "
-                            "before generate final answer at least once and refine your answer if necessary. "
-                            "Put your final answer in the format of `#### <answer>`."
-                        ),
-                    },
-                    {
-                        "role": "user",
-                        "content": question,
-                    },
-                ],
+                "agent_name": "gsm8k_agent",
+                "prompt": build_plain_messages(question_raw),
+                "question": question_raw,
+                "ground_truth": solution,
                 "ability": "math",
                 "reward_model": {"style": "rule", "ground_truth": solution},
                 "extra_info": {
@@ -97,12 +85,10 @@ if __name__ == "__main__":
                     "index": idx,
                     "answer": answer_raw,
                     "question": question_raw,
+                    "ground_truth": solution,
                 },
                 "env_kwargs": json.dumps(
                     {
-                        "env_type": "tool",
-                        "tools": ["calc_gsm8k_reward"],
-                        "tool_format": "hermes",
                         "tools_kwargs": {"ground_truth": solution},
                     }
                 ),

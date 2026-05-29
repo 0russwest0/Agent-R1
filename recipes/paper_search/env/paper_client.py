@@ -6,7 +6,6 @@ from typing import Any, Optional
 
 import httpx
 from pydantic import BaseModel
-from sortedcontainers import SortedList
 
 from .http_retry import httpx_request_with_retry
 
@@ -70,7 +69,7 @@ class PaperPoolEntry(BaseModel):
 class PaperPool:
     def __init__(self, max_size: int = 20, threshold: float = 0.0, max_abstract_words: int = 400):
         self.papers: dict[str, PaperPoolEntry] = {}
-        self.ranked_papers: SortedList[PaperPoolEntry] = SortedList()
+        self.ranked_papers: list[PaperPoolEntry] = []
         self.max_size = max_size
         self.threshold = threshold
         self.max_abstract_words = max_abstract_words
@@ -81,7 +80,8 @@ class PaperPool:
 
         paper_pool_entry = PaperPoolEntry(paper=paper, source=source, origin=origin, score=score)
         self.papers[paper.paper_id] = paper_pool_entry
-        self.ranked_papers.add(paper_pool_entry)
+        self.ranked_papers.append(paper_pool_entry)
+        self.ranked_papers.sort()
 
     def get_paper(self, paper_id: str) -> Optional[PaperPoolEntry]:
         return self.papers.get(paper_id)

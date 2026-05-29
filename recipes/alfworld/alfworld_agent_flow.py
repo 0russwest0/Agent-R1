@@ -11,10 +11,9 @@ from transformers import AutoProcessor, AutoTokenizer
 
 from agent_r1.agent_flow.agent_flow import AgentFlowBase, AgentFlowOutput, AgentFlowStep, register
 from agent_r1.reward_loop.reward_loop import RewardLoopWorker
+from recipes.alfworld.env.tool_executor import INVALID_TOOL_CALL_ACTION, AlfworldToolExecutor
 from recipes.alfworld.prompts import ALFWORLD_TOOL_SCHEMAS
 from recipes.alfworld.utils import (
-    INVALID_TOOL_CALL_ACTION,
-    AlfworldToolExecutor,
     build_alfworld_messages,
     build_invalid_tool_call_observation,
     extract_task_text,

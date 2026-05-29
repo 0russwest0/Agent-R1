@@ -13,8 +13,8 @@ import numpy as np
 
 # Retrieval corpus root: defaults to <repo>/data/corpus/hotpotqa_corpus
 # (index.bin + hpqa_corpus.jsonl). Override with HOTPOTQA_CORPUS_DATA_ROOT.
-_STEPPO_ROOT = Path(__file__).resolve().parents[2]
-_DEFAULT_HOTPOTQA_CORPUS_DATA_ROOT = _STEPPO_ROOT / "data" / "corpus" / "hotpotqa_corpus"
+_REPO_ROOT = Path(__file__).resolve().parents[3]
+_DEFAULT_HOTPOTQA_CORPUS_DATA_ROOT = _REPO_ROOT / "data" / "corpus" / "hotpotqa_corpus"
 
 
 def resolve_hotpotqa_corpus_data_root(corpus_data_dir: Optional[str] = None) -> Path:
@@ -40,7 +40,7 @@ HOTPOTQA_DATA_ROOT = HOTPOTQA_CORPUS_DATA_ROOT
 HOTPOTQA_INDEX_BIN = HOTPOTQA_CORPUS_DATA_ROOT / "index.bin"
 # Passage text for decoding search hits; must match hpqa_corpus.jsonl used when building the index.
 HOTPOTQA_CORPUS_JSONL = HOTPOTQA_CORPUS_DATA_ROOT / "hpqa_corpus.jsonl"
-# hpqa_corpus.npy is only produced by process_hotpotqa for embedding cache; not loaded at runtime.
+# hpqa_corpus.npy is only produced by env/build_index.py for embedding cache; not loaded at runtime.
 
 # Default BGE checkpoint (local dir or Hugging Face hub id). Override via YAML `embedding_model_name` or
 # `HOTPOTQA_EMBEDDING_MODEL` for portability.

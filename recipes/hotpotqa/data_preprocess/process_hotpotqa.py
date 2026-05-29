@@ -3,16 +3,16 @@
 #
 # Download HotpotQA (distractor setting) and export:
 # 1) train.parquet / validation.parquet for verl/Agent-R1 RLHFDataset (prompt + reward_model + data_source)
-# 2) hpqa_corpus.jsonl — deduplicated wiki paragraphs from all contexts (for FAISS indexing, see process_hotpotqa.py)
+# 2) hpqa_corpus.jsonl — deduplicated wiki paragraphs from all contexts (for FAISS indexing, see env/build_index.py)
 #
 # Usage:
 #   pip install datasets pyarrow pandas
-#   python recipes/hotpotqa/prepare_hotpotqa.py \
+#   python recipes/hotpotqa/data_preprocess/process_hotpotqa.py \
 #       --output_dir data/corpus/hotpotqa \
 #       --corpus_output_path data/corpus/hotpotqa_corpus/hpqa_corpus.jsonl
 #
 # Cross-eval only (2WikiMultiHopQA + MuSiQue validation, no corpus rebuild):
-#   python recipes/hotpotqa/prepare_hotpotqa.py \
+#   python recipes/hotpotqa/data_preprocess/process_hotpotqa.py \
 #       --skip_hotpotqa \
 #       --include_cross_eval \
 #       --skip_corpus

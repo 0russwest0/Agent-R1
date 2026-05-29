@@ -10,9 +10,9 @@ from typing import Any
 import pandas as pd
 
 if __package__ is None or __package__ == "":
-    sys.path.append(str(Path(__file__).resolve().parents[2]))
+    sys.path.append(str(Path(__file__).resolve().parents[3]))
 
-from recipes.webshop.env.data import DEFAULT_SEED, build_goals, load_json, load_products_and_attrs
+from recipes.webshop.env.catalog import DEFAULT_SEED, build_goals, load_json, load_products_and_attrs
 
 
 def _goal_options_for_ground_truth(goal_options: Any) -> list[dict[str, str]]:

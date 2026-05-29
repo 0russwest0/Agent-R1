@@ -1,21 +1,21 @@
 #!/usr/bin/env python3
 """Build hpqa_corpus.jsonl for 2WikiMultiHopQA and MuSiQue from downloaded raw data.
 
-Usage (conda env ``steppo``, repo root)::
+Usage (repo root)::
 
-    python recipes/hotpotqa/build_retrieval_corpus.py --dataset all
+    python recipes/hotpotqa/env/build_retrieval_corpus.py --dataset all
 
 Then build FAISS indexes (requires GPU for 2Wiki ~5.9M paragraphs)::
 
     export PYTHONPATH=$(pwd)
     EMB=BAAI/bge-large-en-v1.5
 
-    python recipes/hotpotqa/process_hotpotqa.py \\
+    python recipes/hotpotqa/env/build_index.py \\
         --data_dir data/corpus/musique_corpus \\
         --corpus_path data/corpus/musique_corpus/hpqa_corpus.jsonl \\
         --embedding_model "$EMB" --devices cuda:0 --batch_size 1024
 
-    python recipes/hotpotqa/process_hotpotqa.py \\
+    python recipes/hotpotqa/env/build_index.py \\
         --data_dir data/corpus/2wikimultihopqa_corpus \\
         --corpus_path data/corpus/2wikimultihopqa_corpus/hpqa_corpus.jsonl \\
         --embedding_model "$EMB" --devices cuda:0 --batch_size 1024
@@ -28,7 +28,7 @@ import json
 from pathlib import Path
 from typing import Any, Iterator
 
-_REPO_ROOT = Path(__file__).resolve().parents[2]
+_REPO_ROOT = Path(__file__).resolve().parents[3]
 _DEFAULT_RAW_ROOT = _REPO_ROOT / "data" / "raw"
 _DEFAULT_CORPUS_ROOT = _REPO_ROOT / "data" / "corpus"
 

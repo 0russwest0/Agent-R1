@@ -1,0 +1,55 @@
+env_file: null
+
+dataset:
+  path: ${oc.env:PAPERSEARCH_INFER_DATASET,""}
+
+output:
+  dir: ${oc.env:PAPERSEARCH_INFER_OUTPUT_DIR,results/paper_search/inference}
+  sample_prefix: sample
+
+model:
+  path: ${oc.env:PAPERSEARCH_INFER_MODEL_PATH,""}
+  trust_remote_code: true
+  tool_parser: ${oc.env:PAPER_SEARCH_TOOL_PARSER,hermes}
+  tensor_parallel_size: ${oc.env:VLLM_TENSOR_PARALLEL_SIZE,1}
+  gpu_memory_utilization: ${oc.env:VLLM_GPU_MEMORY_UTILIZATION,0.9}
+  max_model_len: ${oc.env:VLLM_MAX_MODEL_LEN,10240}
+  max_new_tokens: ${oc.env:PAPERSEARCH_INFER_MAX_NEW_TOKENS,8192}
+  temperature: ${oc.env:PAPERSEARCH_INFER_TEMPERATURE,0.1}
+  apply_chat_template_kwargs: {}
+
+services:
+  paper_search_base_url: ${oc.env:PAPER_SEARCH_BASE_URL,http://localhost:4000}
+  selector_base_url: ${oc.env:PAPERSEARCH_SELECTOR_BASE_URL,http://localhost:8000}
+  selector_model_name: ${oc.env:PAPERSEARCH_SELECTOR_MODEL_NAME,""}
+  timeout: 30.0
+
+agent:
+  max_steps: 5
+  max_parallel_calls: 5
+  reward_top_k: 3
+  score_threshold: 0.4
+  search_cost: 0.0
+  expand_cost: 0.0
+  use_discrete_reward: false
+
+search:
+  source: ${oc.env:PAPERSEARCH_INFER_SEARCH_SOURCE,local_db}
+  top_k: 10
+  citations_limit: 30
+  references_limit: -1
+  year: "-2024"
+  max_arxiv_yymm: 2410
+  paper_from_month: null
+  paper_to_month: null
+  serper_search_url: ${oc.env:SERPER_SEARCH_URL,https://google.serper.dev/search}
+
+inference:
+  enabled: true
+  retry_rounds: ${oc.env:PAPERSEARCH_INFER_RETRY_ROUNDS,10}
+
+evaluation:
+  enabled: true
+  output_file: evaluation.json
+  thresholds: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+  top_k_values: [10000, 100, 50, 25]

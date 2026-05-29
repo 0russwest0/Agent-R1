@@ -29,7 +29,7 @@ from recipes.hotpotqa.prompts import (
     HOTPOTQA_TOOL_SCHEMAS,
     HOTPOTQA_USER_PROMPT,
 )
-from recipes.hotpotqa.utils import (
+from recipes.hotpotqa.env.search_tool import (
     DEFAULT_HOTPOTQA_EMBEDDING_MODEL,
     HotpotQASearchToolLegacy,
     parse_legacy_tool_result,

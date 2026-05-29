@@ -36,6 +36,8 @@ python3 -m agent_r1.trainer.main_agent_ppo \
     actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=40 \
     actor_rollout_ref.ref.fsdp_config.param_offload=True \
     algorithm.use_kl_in_reward=False \
+    custom_reward_function.path=recipes/gsm8k/reward_fn.py \
+    custom_reward_function.name=compute_score \
     trainer.critic_warmup=0 \
     trainer.logger='["console"]' \
     trainer.project_name='agent_r1_gsm8k' \

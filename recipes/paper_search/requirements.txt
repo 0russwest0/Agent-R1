@@ -1,0 +1,9 @@
+# Recipe-specific extras for Paper Search. This is not a full Agent-R1 environment lock file.
+httpx
+pydantic
+numpy
+hydra-core
+omegaconf
+vllm
+tqdm
+python-dotenv

@@ -5,14 +5,18 @@ import argparse
 import json
 import os
 from pathlib import Path
+import sys
 
 import faiss
 from FlagEmbedding import FlagAutoModel
 import numpy as np
 
-from recipes.hotpotqa.utils import DEFAULT_HOTPOTQA_EMBEDDING_MODEL
+if __package__ is None or __package__ == "":
+    sys.path.append(str(Path(__file__).resolve().parents[3]))
 
-_REPO_ROOT = Path(__file__).resolve().parents[2]
+from recipes.hotpotqa.env.search_tool import DEFAULT_HOTPOTQA_EMBEDDING_MODEL
+
+_REPO_ROOT = Path(__file__).resolve().parents[3]
 _DEFAULT_DATA_DIR = _REPO_ROOT / "data" / "corpus" / "hotpotqa_corpus"
 _DEFAULT_CORPUS_PATH = _DEFAULT_DATA_DIR / "hpqa_corpus.jsonl"
 

@@ -11,8 +11,9 @@ from transformers import AutoProcessor, AutoTokenizer
 
 from agent_r1.agent_flow.agent_flow import AgentFlowBase, AgentFlowOutput, AgentFlowStep, register
 from agent_r1.reward_loop.reward_loop import RewardLoopWorker
+from recipes.webshop.env.client import WebShopEnvClient
 from recipes.webshop.prompts import WEBSHOP_TOOL_SCHEMAS
-from recipes.webshop.utils import WebShopEnvClient, build_invalid_tool_call_observation, build_webshop_messages
+from recipes.webshop.utils import build_invalid_tool_call_observation, build_webshop_messages
 from verl.experimental.agent_loop.agent_loop import AsyncLLMServerManager, DictConfigWrap
 from verl.experimental.agent_loop.tool_parser import FunctionCall, ToolParser
 from verl.utils.profiler import simple_timer

@@ -23,7 +23,7 @@ if [[ "$HOTPOTQA_LOG_PROB_MICRO_BATCH" -lt 1 ]]; then
 fi
 
 PROJECT_DIR="$(pwd)"
-CONFIG_PATH="$PROJECT_DIR/recipes/hotpotqa/base_faiss_cpu.yaml"
+CONFIG_PATH="$PROJECT_DIR/recipes/hotpotqa/base.yaml"
 
 export HOTPOTQA_DATA_ROOT="${HOTPOTQA_DATA_ROOT:-$PROJECT_DIR/data/corpus/hotpotqa}"
 

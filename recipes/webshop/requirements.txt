@@ -1,0 +1,12 @@
+# Recipe-specific extras for WebShop. This is not a full Agent-R1 environment lock file.
+pandas
+pyarrow
+httpx
+fastapi
+gunicorn
+uvicorn
+rank-bm25
+pydantic
+tqdm
+pyserini
+pyjnius

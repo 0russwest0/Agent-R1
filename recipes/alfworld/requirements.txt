@@ -1,0 +1,5 @@
+# Recipe-specific extras for ALFWorld. This is not a full Agent-R1 environment lock file.
+pandas
+pyarrow
+alfworld==0.4.2
+textworld

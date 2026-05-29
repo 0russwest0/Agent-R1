@@ -18,6 +18,13 @@ Preprocess the GSM8k dataset to parquet format
 import argparse
 import os
 import re
+import sys
+from pathlib import Path
+
+if __package__ is None or __package__ == "":
+    sys.path.append(str(Path(__file__).resolve().parents[3]))
+
+from recipes.gsm8k.prompts import build_plain_messages
 
 
 def extract_solution(solution_str):
@@ -54,25 +61,17 @@ if __name__ == "__main__":
     train_dataset = dataset["train"]
     test_dataset = dataset["test"]
 
-    instruction_following = 'Let\'s think step by step and output the final answer after "####".'
-
     # add a row to each data item that represents a unique id
     def make_map_fn(split):
         def process_fn(example, idx):
             question_raw = example.pop("question")
-
-            question = question_raw + " " + instruction_following
-
             answer_raw = example.pop("answer")
             solution = extract_solution(answer_raw)
             data = {
                 "data_source": data_source,
-                "prompt": [
-                    {
-                        "role": "user",
-                        "content": question,
-                    }
-                ],
+                "prompt": build_plain_messages(question_raw),
+                "question": question_raw,
+                "ground_truth": solution,
                 "ability": "math",
                 "reward_model": {"style": "rule", "ground_truth": solution},
                 "extra_info": {
@@ -80,6 +79,7 @@ if __name__ == "__main__":
                     "index": idx,
                     "answer": answer_raw,
                     "question": question_raw,
+                    "ground_truth": solution,
                 },
             }
             return data

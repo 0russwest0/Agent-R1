@@ -1,0 +1,4 @@
+# Recipe-specific extras for GSM8K. This is not a full Agent-R1 environment lock file.
+datasets
+pandas
+pyarrow
