@@ -30,6 +30,8 @@ import verl.utils.torch_functional as verl_F
 
 def _to_hashable(value):
     """Convert common observation objects to hashable keys for GiGPO grouping."""
+    if value is None:
+        return None
     if isinstance(value, int | float | str | bool):
         return value
     if isinstance(value, np.integer | np.floating):

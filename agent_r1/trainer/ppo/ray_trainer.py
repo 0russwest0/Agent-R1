@@ -219,7 +219,7 @@ def critic_vf_loss_response_mask(response_mask: torch.Tensor, adv_key: str) -> t
     if adv_key == "token_gae":
         return response_mask.clone()
     value_mask = torch.zeros_like(response_mask)
-    value_mask[:, 0] = 1
+    value_mask[:, 0] = response_mask[:, 0]
     return value_mask
 
 
