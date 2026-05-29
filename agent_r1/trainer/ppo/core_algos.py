@@ -345,18 +345,20 @@ def compute_grpo_outcome_advantage(
 def compute_reinforce_plus_plus_outcome_advantage(
     token_level_rewards: torch.Tensor,
     response_mask: torch.Tensor,
+    trajectory_uids: np.ndarray,
+    step_indices: np.ndarray,
     gamma: float,
 ) -> tuple[torch.Tensor, torch.Tensor]:
-    """Compute REINFORCE++ token-level discounted returns and whitened advantages."""
+    """Compute REINFORCE++ step-discounted returns and whitened advantages."""
     with torch.no_grad():
-        returns = torch.zeros_like(token_level_rewards)
-        running_return = 0
-
-        for t in reversed(range(token_level_rewards.shape[1])):
-            running_return = token_level_rewards[:, t] + gamma * running_return
-            returns[:, t] = running_return
-            running_return = running_return * response_mask[:, t]
-
+        step_returns = compute_step_discounted_returns(
+            token_level_rewards=token_level_rewards,
+            response_mask=response_mask,
+            trajectory_uids=trajectory_uids,
+            step_indices=step_indices,
+            gamma=gamma,
+        )
+        returns = step_returns.unsqueeze(-1) * response_mask
         advantages = verl_F.masked_whiten(returns, response_mask)
         advantages = advantages * response_mask
 

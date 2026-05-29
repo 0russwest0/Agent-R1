@@ -313,6 +313,8 @@ def compute_advantage(
         valid_advantages, valid_returns = compute_reinforce_plus_plus_outcome_advantage(
             token_level_rewards=valid_data.batch["token_level_rewards"],
             response_mask=valid_data.batch["response_mask"],
+            trajectory_uids=valid_data.non_tensor_batch["trajectory_uids"],
+            step_indices=valid_data.non_tensor_batch["step_indices"],
             gamma=gamma,
         )
         advantages[valid_mask] = valid_advantages
