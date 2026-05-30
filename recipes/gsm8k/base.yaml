@@ -1,5 +1,7 @@
 - name: gsm8k_agent
-  _target_: recipes.gsm8k.gsm8k_agent_flow.GSM8KAgentFlow
+  _target_: agent_r1.agent_flow.agent_env_loop.AgentEnvLoop
+  env_imports:
+    - recipes.gsm8k.env.gsm8k_tool_env
   env_type: gsm8k_agent
   tools:
     - calc_gsm8k_reward

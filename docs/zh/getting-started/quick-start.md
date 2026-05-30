@@ -47,5 +47,5 @@ bash examples/gsm8k/run_ppo.sh
 
 - 阅读 [`Step-level MDP`](../core-concepts/step-level-mdp.md)，理解主要训练抽象。
 - 阅读 [`分层抽象`](../core-concepts/layered-abstractions.md)，了解 `AgentFlowBase`、`AgentEnvLoop` 与 `ToolEnv` 如何组合。
-- 继续阅读 [`智能体任务教程`](../tutorials/agent-task.md)，进入多步交互工作流。
+- 继续阅读 [`智能体任务教程`](../tutorials/agent-task.md)，查看基于 `ToolEnv + BaseTool` 的最小 GSM8K + Tool 示例。
 - 使用 [`Recipes 与算法`](../tutorials/recipes-and-algorithms.md) 查找任务 recipe 和算法脚本。

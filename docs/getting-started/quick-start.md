@@ -47,5 +47,5 @@ The script entrypoint is [`examples/gsm8k/run_ppo.sh`](https://github.com/AgentR
 
 - Read [`Step-level MDP`](../core-concepts/step-level-mdp.md) to understand the main training abstraction.
 - Read [`Layered Abstractions`](../core-concepts/layered-abstractions.md) to see how `AgentFlowBase`, `AgentEnvLoop`, and `ToolEnv` fit together.
-- Continue to the [`Agent Task Tutorial`](../tutorials/agent-task.md) for the main Agent-R1 workflow based on multi-step interaction.
+- Continue to the [`Agent Task Tutorial`](../tutorials/agent-task.md) for the minimal GSM8K + Tool example based on `ToolEnv + BaseTool`.
 - Use [`Recipes and Algorithms`](../tutorials/recipes-and-algorithms.md) to find task-specific recipes and algorithm scripts.

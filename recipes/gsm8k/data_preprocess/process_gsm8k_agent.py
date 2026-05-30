@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Preprocess the GSM8k dataset to parquet format for the GSM8K agent pipeline.
+Preprocess the GSM8K dataset to parquet format for the GSM8K + Tool pipeline.
 
 The output keeps task fields structured so the recipe-local GSM8K environment
 can build prompts dynamically at rollout time.

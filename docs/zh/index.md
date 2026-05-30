@@ -32,7 +32,7 @@ Agent-R1 是一个面向智能体强化学习的开源框架。它支持构建�
 
 - 如果你想快速跑通环境，先阅读 [`快速开始`](getting-started/index.md)：复用 `verl` 环境，从 [ModelScope](https://www.modelscope.cn/datasets/Melmaphother/Agent-R1-data) 下载处理好的数据集，并运行一个 GSM8K sanity check。
 - 如果你想理解框架设计，阅读 [`Step-level MDP`](core-concepts/step-level-mdp.md) 和 [`分层抽象`](core-concepts/layered-abstractions.md)。
-- 如果你想看主要的 Agent-R1 工作流，阅读 [`智能体任务教程`](tutorials/agent-task.md)：多步交互、环境反馈与工具调用。
+- 如果你想看最小工具调用示例，阅读 [`智能体任务教程`](tutorials/agent-task.md)：基于 `ToolEnv + BaseTool` 的 GSM8K + Tool。
 - 如果你想了解当前 recipe 与算法脚本，阅读 [`Recipes 与算法`](tutorials/recipes-and-algorithms.md)。
 
 ## 文档范围

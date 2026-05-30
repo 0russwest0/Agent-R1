@@ -1,6 +1,6 @@
 # 智能体任务教程
 
-本教程展示 Agent-R1 的主要路径：一个基于 recipe-local agent flow 和环境实现的 **多步、工具增强智能体任务**。
+本教程展示 Agent-R1 中最简单的多步工具调用路径：基于通用 `AgentEnvLoop`、recipe-local `ToolEnv` 和 recipe-local `BaseTool` 实现的 **GSM8K + Tool**。
 
 示例使用 GSM8K，但重点不是这个 benchmark 本身，而是展示 Agent-R1 如何把一行数据变成环境驱动的多步 rollout。
 
@@ -27,7 +27,7 @@ python3 -m recipes.gsm8k.data_preprocess.process_gsm8k_agent --local_save_dir ~/
 
 概念上，每个样本会表达：
 
-1. 使用 recipe-local `gsm8k_agent` rollout 逻辑
+1. 使用配置中的 `gsm8k_agent` 入口，这个入口指向通用 `AgentEnvLoop`
 2. 实例化 GSM8K tool environment
 3. 在环境中暴露 `calc_gsm8k_reward` 工具
 
@@ -39,7 +39,7 @@ python3 -m recipes.gsm8k.data_preprocess.process_gsm8k_agent --local_save_dir ~/
 bash examples/gsm8k/run_grpo.sh
 ```
 
-这个脚本会把 rollout 从单步生成切换到 agent loop：
+这个脚本会把 rollout 从单步生成切换到通用 agent-environment loop：
 
 ```bash
 actor_rollout_ref.rollout.agent.default_agent_flow=gsm8k_agent \
@@ -59,7 +59,7 @@ data.val_files=$HOME/data/gsm8k_agent/test.parquet \
 
 ```mermaid
 graph TD
-    datasetRow["Dataset row"] --> agentFlow["GSM8KAgentFlow"]
+    datasetRow["Dataset row"] --> agentFlow["AgentEnvLoop"]
     agentFlow --> toolEnv["GSM8KToolEnv"]
     toolEnv --> llmStep["LLM response"]
     llmStep --> toolCall["Tool call parsing"]
@@ -70,7 +70,7 @@ graph TD
 
 更具体地说：
 
-1. `GSM8KAgentFlow` 读取 recipe defaults 和每个样本的 `env_kwargs`。
+1. `AgentEnvLoop` 读取 recipe defaults 和每个样本的 `env_kwargs`。
 2. `AgentEnv.from_config(env_type="gsm8k_agent", ...)` 创建 `GSM8KToolEnv`。
 3. `GSM8KToolEnv.reset()` 根据 `question` 和 `ground_truth` 构建 prompt messages。
 4. LLM 生成回复。
@@ -80,7 +80,7 @@ graph TD
 
 ## 4. 奖励来自哪里
 
-内置 GSM8K 工具在 `agent_r1/tool/tools/gsm8k.py` 中注册为 `calc_gsm8k_reward`。
+recipe-local GSM8K 工具在 `recipes/gsm8k/tools.py` 中注册为 `calc_gsm8k_reward`。
 
 它在这个示例中的作用是：
 
@@ -90,9 +90,9 @@ graph TD
 
 这正是本教程对 Agent-R1 有价值的地方：模型不只是生成一个最终答案，而是在可以评估并反馈信息的环境中进行多步交互。
 
-## 5. 为什么这个教程比单步脚本更重要
+## 5. 为什么这个教程与单步脚本分开
 
-单步 GSM8K 脚本仍然有用，但它主要是 setup check。本教程更接近 Agent-R1 的设计中心，因为它展示了：
+单步 GSM8K 脚本仍然有用，但它主要是 setup check。本教程不同：它是最低抽象层的最小示例，用户只需要定义工具，标准多轮工具调用由 `ToolEnv + BaseTool` 承担。它展示了：
 
 - step-level 环境转移
 - 多步 agent loop
@@ -102,5 +102,5 @@ graph TD
 ## 6. 接下来阅读
 
 - 阅读 [`Step-level MDP`](../core-concepts/step-level-mdp.md)，将本教程与核心 RL formulation 对齐。
-- 阅读 [`分层抽象`](../core-concepts/layered-abstractions.md)，理解这个示例为什么自然对应 `AgentEnvLoop + ToolEnv`。
+- 阅读 [`分层抽象`](../core-concepts/layered-abstractions.md)，理解这个示例为什么自然对应 `ToolEnv + BaseTool`。
 - 阅读 [`Recipes 与算法`](recipes-and-algorithms.md)，查看其他任务 recipe 和启动脚本。

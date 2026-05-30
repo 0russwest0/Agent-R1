@@ -40,7 +40,7 @@ recipes/<task>/
 
 | Recipe | What it covers | Main entry points |
 | --- | --- | --- |
-| `gsm8k` | Grade-school math reasoning. It includes both a plain data path and an agent path where the environment can build prompts dynamically and expose `calc_gsm8k_reward`. | `data_preprocess/process_gsm8k.py`, `data_preprocess/process_gsm8k_agent.py`, `gsm8k_agent_flow.py`, `env/gsm8k_tool_env.py` |
+| `gsm8k` | Grade-school math reasoning. Plain GSM8K is kept as a single-turn sanity check, while GSM8K + Tool is the minimal `ToolEnv + BaseTool` example with dynamic prompts and `calc_gsm8k_reward`. | `data_preprocess/process_gsm8k.py`, `data_preprocess/process_gsm8k_agent.py`, `env/gsm8k_tool_env.py`, `tools.py` |
 | `hotpotqa` | Multi-hop question answering with a retrieval environment. The recipe keeps preprocessing separate from retrieval-index construction. | `data_preprocess/process_hotpotqa.py`, `env/build_retrieval_corpus.py`, `env/build_index.py`, `hotpotqa_agent_flow.py` |
 | `alfworld` | Text-based household task completion through an ALFWorld-style environment wrapper and tool executor. | `data_preprocess/process_alfworld.py`, `env/alfworld_wrapper.py`, `env/tool_executor.py`, `alfworld_agent_flow.py` |
 | `webshop` | Shopping-agent training with a local WebShop environment server and catalog artifacts. | `data_preprocess/process_webshop.py`, `env/run_env_server.sh`, `env/full_catalog.py`, `webshop_agent_flow.py` |
@@ -65,5 +65,5 @@ Processed datasets are available from the Agent-R1 data release on [ModelScope](
 - Use `recipes/<task>/README.md` for task-specific dependencies, resource expectations, and environment setup.
 - Download processed data from [ModelScope](https://www.modelscope.cn/datasets/Melmaphother/Agent-R1-data) before running the full recipe scripts.
 - Use `examples/<task>/run_*.sh` for launch commands and Hydra overrides.
-- Use `recipes/<task>/base.yaml` to see the recipe-local agent configuration.
+- Use `recipes/<task>/base.yaml` to see the recipe-local rollout configuration.
 - Use `data_preprocess/process_*.py` only when you need to regenerate or inspect dataset formatting.

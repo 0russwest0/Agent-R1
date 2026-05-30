@@ -4,7 +4,7 @@
 
 ## 本节内容
 
-- [`智能体任务教程`](agent-task.md)：基于 `AgentEnvLoop` 和 `ToolEnv` 的多步交互主流程。
+- [`智能体任务教程`](agent-task.md)：基于 `ToolEnv + BaseTool` 的最小 GSM8K + Tool 示例。
 - [`Recipes 与算法`](recipes-and-algorithms.md)：当前任务 recipe、环境入口和算法启动脚本的简明指南。
 
 ## 范围

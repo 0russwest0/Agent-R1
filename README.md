@@ -58,10 +58,10 @@ Agent-R1 uses layered abstractions so new tasks can reuse the same trainer witho
 
 | Layer | Responsibility | When to Use |
 |---|---|---|
-| `AgentFlowBase` | Full control over prompt construction, model calls, and step assembly. | Custom workflows or experimental agent logic. |
-| `AgentEnvLoop` | The main multi-step loop connecting model generation with environment `reset()` / `step()`. | Most agentic RL tasks. |
-| `AgentEnv` | Task environment interface returning observations, rewards, termination, and metadata. | When your task has state transitions. |
-| `ToolEnv` | Built-in environment for parsing tool calls, executing tools, and feeding observations back. | Tool-augmented tasks such as GSM8K-tool. |
+| `AgentFlowBase` | Full control over prompt construction, model calls, branching, context management, and step assembly. | Complex custom agents that do not fit a standard environment loop. |
+| `AgentEnvLoop` | Generic loop connecting model generation with an environment's `reset()` / `step()` interface. | Agent tasks that can be modeled as environment interaction, including traditional RL-style environments. |
+| `AgentEnv` | Task environment interface returning observations, rewards, termination, and metadata. | Implementing the full environment logic for `AgentEnvLoop`. |
+| `ToolEnv` | Built-in environment for standard multi-turn tool calling. | Tool-augmented tasks where you only need to define tools. |
 | `BaseTool` | Standard interface for registering executable tools. | Adding calculators, search tools, APIs, or task-specific checkers. |
 
 The main loop is:
@@ -82,7 +82,7 @@ The recommended path is:
 1. Read the [Getting Started](https://agentr1.github.io/Agent-R1/getting-started/) page for the minimal setup flow.
 2. Download the processed data release from [ModelScope](https://www.modelscope.cn/datasets/Melmaphother/Agent-R1-data), then place or symlink each task's files to the paths expected by the corresponding recipe.
 3. Use [`examples/gsm8k/run_ppo.sh`](examples/gsm8k/run_ppo.sh) as a sanity check that the environment is wired correctly.
-4. Move to the [Agent Task Tutorial](https://agentr1.github.io/Agent-R1/tutorials/agent-task/) for the main Agent-R1 workflow based on multi-step interaction and tool use.
+4. Move to the [Agent Task Tutorial](https://agentr1.github.io/Agent-R1/tutorials/agent-task/) for the minimal GSM8K + Tool example based on `ToolEnv + BaseTool`.
 5. Read [Recipes and Algorithms](https://agentr1.github.io/Agent-R1/tutorials/recipes-and-algorithms/) for the current task integrations and launch-script layout.
 
 Download the processed data with either the ModelScope CLI or git:
@@ -108,16 +108,16 @@ bash examples/gsm8k/run_ppo.sh
 
 This stage is only a **setup check**. It helps confirm that your environment, model path, dataset path, and training stack are wired correctly.
 
-### Stage 2: Run the Main Agent-R1 Workflow
+### Stage 2: Try the Minimal Tool-Calling Example
 
-Use the processed GSM8K agent files from the data release, or regenerate the tool-augmented dataset locally, then launch the multi-step agent training script:
+GSM8K + Tool is the simplest `ToolEnv + BaseTool` example. Use the processed GSM8K tool files from the data release, or regenerate the tool-augmented dataset locally, then launch the multi-step tool-calling script:
 
 ```bash
 python3 -m recipes.gsm8k.data_preprocess.process_gsm8k_agent --local_save_dir ~/data/gsm8k_agent
 bash examples/gsm8k/run_grpo.sh
 ```
 
-This is the main Agent-R1 path, where the recipe-local `gsm8k_agent` flow dynamically builds prompts and drives multi-step tool interaction.
+This path uses the generic `AgentEnvLoop` with the recipe-local `GSM8KToolEnv` and `calc_gsm8k_reward` tool. The plain GSM8K script remains a single-turn environment sanity check.
 
 Core concepts:
 

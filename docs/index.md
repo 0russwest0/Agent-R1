@@ -30,7 +30,7 @@ Agent-R1 is an open-source framework for training powerful language agents with 
 
 - Start with [`Getting Started`](getting-started/index.md) if you want the minimal path: use the same environment as `verl`, download the processed data from [ModelScope](https://www.modelscope.cn/datasets/Melmaphother/Agent-R1-data), run a sanity check, and confirm the repository is ready.
 - Read [`Step-level MDP`](core-concepts/step-level-mdp.md) and [`Layered Abstractions`](core-concepts/layered-abstractions.md) if you want to understand the framework design before touching code.
-- Follow [`Agent Task Tutorial`](tutorials/agent-task.md) if you want to see the main Agent-R1 workflow: multi-step interaction through `AgentEnvLoop` and `ToolEnv`.
+- Follow [`Agent Task Tutorial`](tutorials/agent-task.md) if you want to see the minimal GSM8K + Tool example through `ToolEnv + BaseTool`.
 - Read [`Recipes and Algorithms`](tutorials/recipes-and-algorithms.md) for the current GSM8K, HotpotQA, ALFWorld, WebShop, paper-search, and algorithm script layout.
 
 ## Scope of This Documentation

@@ -4,6 +4,9 @@ from typing import Any
 
 from agent_r1.env.base import AgentEnv, Observation
 from agent_r1.env.envs.tool import ToolEnv
+
+# Importing the module registers the recipe-local BaseTool implementation.
+from recipes.gsm8k import tools as _tools  # noqa: F401
 from recipes.gsm8k.prompts import build_agent_messages
 
 

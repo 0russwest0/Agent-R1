@@ -2,7 +2,7 @@
 
 ## 从完全灵活到开箱即用
 
-Agent-R1 提供一套 **分层抽象**。每一层都会增加更多结构和约定，同时降低使用门槛。关键设计是：所有层都仍然符合 step-level RL 视角。
+Agent-R1 提供一套 **三层抽象**。顶层提供最大灵活度，中间层刻画 agent 与环境交互，底层覆盖标准工具调用任务。关键设计是：所有层都仍然符合 step-level RL 视角。
 
 ```mermaid
 graph TD
@@ -26,9 +26,9 @@ graph TD
 
 ## Layer 1: `AgentFlowBase`
 
-当你需要完全控制 prompt 如何构建、LLM 如何调用、step 如何组装成 `AgentFlowOutput` 时，可以继承 `AgentFlowBase`。
+当你需要完全控制 prompt 如何构建、LLM 如何调用、条件分支如何调度、上下文如何管理、step 如何组装成 `AgentFlowOutput` 时，可以继承 `AgentFlowBase`。
 
-这是最灵活的一层，也是最低层的接口。它适合自定义 workflow 或实验性流程，尤其是你不想把任务显式建模成环境的时候。
+这是最灵活的一层。它适合复杂自定义 agent，例如带有条件分支、特殊上下文管理策略、多阶段 workflow，或不适合显式建模成环境的实验性流程。
 
 ```python
 from agent_r1.agent_flow import AgentFlowBase, AgentFlowOutput
@@ -40,8 +40,6 @@ class MyWorkflow(AgentFlowBase):
 ```
 
 ## Layer 2: `AgentEnvLoop + AgentEnv`
-
-这是 Agent-R1 的主要抽象。
 
 当你的任务可以写成带有 `reset()` 和 `step()` 的环境时，使用 `AgentEnvLoop`。这个 loop 负责 LLM generation，而环境负责控制下一步观察和奖励。
 
@@ -71,7 +69,7 @@ class MyEnv(AgentEnv):
 
 ## Layer 3: `ToolEnv + BaseTool`
 
-许多 Agent-R1 任务天然是 **工具增强的多步交互**。对于这类任务，Agent-R1 提供内置环境 `ToolEnv`，它会：
+标准多轮工具调用任务应该使用 `ToolEnv + BaseTool`。对于这类任务，Agent-R1 提供内置环境 `ToolEnv`，它会：
 
 - 存储对话历史
 - 从模型输出中解析工具调用
@@ -103,12 +101,13 @@ class Calculator(BaseTool):
 
 - `agent_r1/env/envs/tool.py`
 - `agent_r1/tool/base.py`
-- `agent_r1/tool/tools/gsm8k.py`
+- `recipes/gsm8k/tools.py`
 
 ## 当前版本最重要的点
 
 对于当前轻量文档，最关键的是：
 
-- `SingleStepAgentFlow` 存在，适合 sanity check。
-- `AgentEnvLoop` 是框架设计中心。
-- `ToolEnv + BaseTool` 是当前构建多步智能体任务最直接的方式。
+- `SingleStepAgentFlow` 适合 plain GSM8K 这类单轮 sanity check。
+- `AgentFlowBase` 适合完全自定义的 agent 逻辑。
+- `AgentEnvLoop` 适合有完整环境动态的任务。
+- `ToolEnv + BaseTool` 是标准工具调用示例的最简单路径，例如 GSM8K + Tool。

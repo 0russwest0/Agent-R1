@@ -1,6 +1,6 @@
 # Agent Task Tutorial
 
-This tutorial follows the main Agent-R1 path: a **multi-step, tool-augmented agent task** built as a recipe-local agent flow and environment.
+This tutorial shows the simplest multi-step tool-calling path in Agent-R1: **GSM8K + Tool** built with the generic `AgentEnvLoop`, a recipe-local `ToolEnv`, and a recipe-local `BaseTool`.
 
 The example uses GSM8K, but the important part is not the benchmark itself. The goal is to show how Agent-R1 turns a dataset row into an environment-driven, multi-step rollout.
 
@@ -27,7 +27,7 @@ Compared with the single-step sanity-check dataset, this preprocessing script ke
 
 Conceptually, each sample says:
 
-1. use the recipe-local `gsm8k_agent` rollout logic
+1. use the configured `gsm8k_agent` entry, which points to the generic `AgentEnvLoop`
 2. instantiate the GSM8K tool environment
 3. expose the `calc_gsm8k_reward` tool inside that environment
 
@@ -39,7 +39,7 @@ Run:
 bash examples/gsm8k/run_grpo.sh
 ```
 
-This script switches the rollout from single-step generation to the agent loop:
+This script switches the rollout from single-step generation to the generic agent-environment loop:
 
 ```bash
 actor_rollout_ref.rollout.agent.default_agent_flow=gsm8k_agent \
@@ -59,7 +59,7 @@ At a high level, one sample follows this path:
 
 ```mermaid
 graph TD
-    datasetRow["Dataset row"] --> agentFlow["GSM8KAgentFlow"]
+    datasetRow["Dataset row"] --> agentFlow["AgentEnvLoop"]
     agentFlow --> toolEnv["GSM8KToolEnv"]
     toolEnv --> llmStep["LLM response"]
     llmStep --> toolCall["Tool call parsing"]
@@ -70,7 +70,7 @@ graph TD
 
 More concretely:
 
-1. `GSM8KAgentFlow` reads recipe defaults and per-sample `env_kwargs`.
+1. `AgentEnvLoop` reads recipe defaults and per-sample `env_kwargs`.
 2. `AgentEnv.from_config(env_type="gsm8k_agent", ...)` creates a `GSM8KToolEnv`.
 3. `GSM8KToolEnv.reset()` builds prompt messages from `question` and `ground_truth`.
 4. The LLM produces a response.
@@ -80,7 +80,7 @@ More concretely:
 
 ## 4. Where the Reward Comes From
 
-The built-in GSM8K tool is registered as `calc_gsm8k_reward` in `agent_r1/tool/tools/gsm8k.py`.
+The recipe-local GSM8K tool is registered as `calc_gsm8k_reward` in `recipes/gsm8k/tools.py`.
 
 Its role in this example is to:
 
@@ -90,9 +90,9 @@ Its role in this example is to:
 
 This is what makes the tutorial useful for Agent-R1: the model is not just generating one final answer, it is interacting with an environment that can evaluate and feed back information across multiple steps.
 
-## 5. Why This Tutorial Matters More Than the Single-Step Script
+## 5. Why This Tutorial Is Separate From the Single-Step Script
 
-The single-step GSM8K script is still useful, but only as a setup check. This tutorial is closer to the actual design center of Agent-R1 because it demonstrates:
+The single-step GSM8K script is still useful as a setup check. This tutorial is different: it is the minimal example for the lowest abstraction layer, where users only define tools and let `ToolEnv + BaseTool` handle standard multi-turn tool interaction. It demonstrates:
 
 - a step-level environment transition
 - a multi-step agent loop
@@ -102,5 +102,5 @@ The single-step GSM8K script is still useful, but only as a setup check. This tu
 ## 6. Where to Look Next
 
 - Read [`Step-level MDP`](../core-concepts/step-level-mdp.md) to connect this tutorial to the core RL formulation.
-- Read [`Layered Abstractions`](../core-concepts/layered-abstractions.md) to see why this example maps naturally to `AgentEnvLoop + ToolEnv`.
+- Read [`Layered Abstractions`](../core-concepts/layered-abstractions.md) to see why this example maps naturally to `ToolEnv + BaseTool`.
 - Read [`Recipes and Algorithms`](recipes-and-algorithms.md) to see the other task recipes and launch scripts.

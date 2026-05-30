@@ -40,7 +40,7 @@ recipes/<task>/
 
 | Recipe | 覆盖内容 | 主要入口 |
 | --- | --- | --- |
-| `gsm8k` | 小学数学推理。包含 plain data path，以及可以动态构建 prompt 并暴露 `calc_gsm8k_reward` 的 agent path。 | `data_preprocess/process_gsm8k.py`, `data_preprocess/process_gsm8k_agent.py`, `gsm8k_agent_flow.py`, `env/gsm8k_tool_env.py` |
+| `gsm8k` | 小学数学推理。Plain GSM8K 保留为单轮 sanity check，GSM8K + Tool 则作为最小 `ToolEnv + BaseTool` 示例，支持动态 prompt 和 `calc_gsm8k_reward`。 | `data_preprocess/process_gsm8k.py`, `data_preprocess/process_gsm8k_agent.py`, `env/gsm8k_tool_env.py`, `tools.py` |
 | `hotpotqa` | 带检索环境的多跳问答。数据预处理与检索索引构建分离。 | `data_preprocess/process_hotpotqa.py`, `env/build_retrieval_corpus.py`, `env/build_index.py`, `hotpotqa_agent_flow.py` |
 | `alfworld` | 基于文本的 household task，通过 ALFWorld-style environment wrapper 和 tool executor 完成。 | `data_preprocess/process_alfworld.py`, `env/alfworld_wrapper.py`, `env/tool_executor.py`, `alfworld_agent_flow.py` |
 | `webshop` | 购物智能体训练，包含本地 WebShop 环境服务与商品目录 artifacts。 | `data_preprocess/process_webshop.py`, `env/run_env_server.sh`, `env/full_catalog.py`, `webshop_agent_flow.py` |
@@ -65,5 +65,5 @@ recipes/<task>/
 - 使用 `recipes/<task>/README.md` 查看任务特定依赖、资源要求和环境设置。
 - 运行完整 recipe 脚本前，先从 [ModelScope](https://www.modelscope.cn/datasets/Melmaphother/Agent-R1-data) 下载处理好的数据集。
 - 使用 `examples/<task>/run_*.sh` 查看启动命令和 Hydra overrides。
-- 使用 `recipes/<task>/base.yaml` 查看 recipe-local agent 配置。
+- 使用 `recipes/<task>/base.yaml` 查看 recipe-local rollout 配置。
 - 只有在需要重新生成或检查数据格式时，才需要使用 `data_preprocess/process_*.py`。

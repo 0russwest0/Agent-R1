@@ -2,7 +2,7 @@
 
 ## From Maximum Flexibility to Out-of-the-Box
 
-Agent-R1 provides a **layered abstraction** system. Each layer adds more structure and convention while lowering the barrier to entry. The key design choice is that all layers still fit the same step-level RL view.
+Agent-R1 provides a **three-layer abstraction** system. The top layer gives maximum control, the middle layer captures agent-environment interaction, and the bottom layer covers standard tool-calling tasks. All layers still fit the same step-level RL view.
 
 ```mermaid
 graph TD
@@ -26,9 +26,9 @@ graph TD
 
 ## Layer 1: `AgentFlowBase`
 
-Subclass `AgentFlowBase` when you want full control over how prompts are built, how the LLM is called, and how steps are assembled into an `AgentFlowOutput`.
+Subclass `AgentFlowBase` when you want full control over how prompts are built, how the LLM is called, how branches are scheduled, how context is managed, and how steps are assembled into an `AgentFlowOutput`.
 
-This is the most flexible layer, but it is also the lowest-level one. It is useful for custom workflows and experiments where you do not want to model the task explicitly as an environment.
+This is the most flexible layer. It is useful for complex custom agents with conditional branches, specialized context-management policies, multi-stage workflows, or experiments where you do not want to model the task explicitly as an environment.
 
 ```python
 from agent_r1.agent_flow import AgentFlowBase, AgentFlowOutput
@@ -40,8 +40,6 @@ class MyWorkflow(AgentFlowBase):
 ```
 
 ## Layer 2: `AgentEnvLoop + AgentEnv`
-
-This is the main abstraction for Agent-R1.
 
 When your task can be written as an environment with `reset()` and `step()`, use `AgentEnvLoop`. The loop handles the LLM generation, while the environment controls the next observation and reward.
 
@@ -71,7 +69,7 @@ The relevant implementation lives in:
 
 ## Layer 3: `ToolEnv + BaseTool`
 
-Many Agent-R1 tasks are naturally expressed as **tool-augmented multi-step interaction**. For this case, Agent-R1 provides `ToolEnv`, a built-in environment that:
+Standard multi-turn tool-calling tasks should use `ToolEnv + BaseTool`. For this case, Agent-R1 provides `ToolEnv`, a built-in environment that:
 
 - stores conversation history
 - parses tool calls from model output
@@ -103,12 +101,13 @@ The relevant implementation lives in:
 
 - `agent_r1/env/envs/tool.py`
 - `agent_r1/tool/base.py`
-- `agent_r1/tool/tools/gsm8k.py`
+- `recipes/gsm8k/tools.py`
 
 ## What Matters in This Version
 
 For the current lightweight documentation, the key takeaway is:
 
-- `SingleStepAgentFlow` exists and is useful for sanity checks.
-- `AgentEnvLoop` is the center of the framework design.
-- `ToolEnv + BaseTool` is the most direct way to build multi-step agent tasks today.
+- `SingleStepAgentFlow` is useful for single-turn sanity checks such as plain GSM8K.
+- `AgentFlowBase` is for fully custom agent logic.
+- `AgentEnvLoop` is for tasks with complete environment dynamics.
+- `ToolEnv + BaseTool` is the simplest path for standard tool-calling examples such as GSM8K + Tool.
