@@ -117,7 +117,7 @@ python3 -m recipes.gsm8k.data_preprocess.process_gsm8k_agent --local_save_dir ~/
 bash examples/gsm8k/run_steppo_tool.sh
 ```
 
-This path uses the generic `AgentEnvLoop` with the recipe-local `GSM8KToolEnv` and `calc_gsm8k_reward` tool. The plain GSM8K script remains a single-turn environment sanity check.
+This path uses the generic `AgentEnvLoop` with the built-in `ToolEnv` and recipe-local `calc_gsm8k_reward` tool. The plain GSM8K script remains a single-turn environment sanity check.
 
 Core concepts:
 

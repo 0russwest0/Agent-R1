@@ -28,7 +28,7 @@ Compared with the single-step sanity-check dataset, this preprocessing script ke
 Conceptually, each sample says:
 
 1. use the configured `gsm8k_agent` entry, which points to the generic `AgentEnvLoop`
-2. instantiate the GSM8K tool environment
+2. instantiate the built-in tool environment
 3. expose the `calc_gsm8k_reward` tool inside that environment
 
 ## 2. Launch the Agent Task Training Script
@@ -60,7 +60,7 @@ At a high level, one sample follows this path:
 ```mermaid
 graph TD
     datasetRow["Dataset row"] --> agentFlow["AgentEnvLoop"]
-    agentFlow --> toolEnv["GSM8KToolEnv"]
+    agentFlow --> toolEnv["ToolEnv"]
     toolEnv --> llmStep["LLM response"]
     llmStep --> toolCall["Tool call parsing"]
     toolCall --> toolExec["BaseTool execution"]
@@ -71,8 +71,8 @@ graph TD
 More concretely:
 
 1. `AgentEnvLoop` reads recipe defaults and per-sample `env_kwargs`.
-2. `AgentEnv.from_config(env_type="gsm8k_agent", ...)` creates a `GSM8KToolEnv`.
-3. `GSM8KToolEnv.reset()` builds prompt messages from `question` and `ground_truth`.
+2. `AgentEnv.from_config(env_type="tool", ...)` creates the built-in `ToolEnv`.
+3. `ToolEnv.reset()` uses the chat prompt stored in the dataset row.
 4. The LLM produces a response.
 5. `ToolEnv.step()` parses tool calls from the response and executes the registered tool.
 6. Tool output is appended to the conversation as the next observation.
@@ -80,7 +80,7 @@ More concretely:
 
 ## 4. Where the Reward Comes From
 
-The GSM8K tool is registered as `calc_gsm8k_reward` in `agent_r1/tool/tools/gsm8k.py`.
+The GSM8K tool is registered as `calc_gsm8k_reward` in `recipes/gsm8k/tool.py`.
 
 Its role in this example is to:
 

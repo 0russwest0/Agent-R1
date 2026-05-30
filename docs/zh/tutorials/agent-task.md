@@ -28,7 +28,7 @@ python3 -m recipes.gsm8k.data_preprocess.process_gsm8k_agent --local_save_dir ~/
 概念上，每个样本会表达：
 
 1. 使用配置中的 `gsm8k_agent` 入口，这个入口指向通用 `AgentEnvLoop`
-2. 实例化 GSM8K tool environment
+2. 实例化内置 tool environment
 3. 在环境中暴露 `calc_gsm8k_reward` 工具
 
 ## 2. 启动智能体训练脚本
@@ -60,7 +60,7 @@ data.val_files=$HOME/data/gsm8k_agent/test.parquet \
 ```mermaid
 graph TD
     datasetRow["Dataset row"] --> agentFlow["AgentEnvLoop"]
-    agentFlow --> toolEnv["GSM8KToolEnv"]
+    agentFlow --> toolEnv["ToolEnv"]
     toolEnv --> llmStep["LLM response"]
     llmStep --> toolCall["Tool call parsing"]
     toolCall --> toolExec["BaseTool execution"]
@@ -71,8 +71,8 @@ graph TD
 更具体地说：
 
 1. `AgentEnvLoop` 读取 recipe defaults 和每个样本的 `env_kwargs`。
-2. `AgentEnv.from_config(env_type="gsm8k_agent", ...)` 创建 `GSM8KToolEnv`。
-3. `GSM8KToolEnv.reset()` 根据 `question` 和 `ground_truth` 构建 prompt messages。
+2. `AgentEnv.from_config(env_type="tool", ...)` 创建内置 `ToolEnv`。
+3. `ToolEnv.reset()` 使用数据行中保存的 chat prompt。
 4. LLM 生成回复。
 5. `ToolEnv.step()` 从回复中解析工具调用，并执行注册工具。
 6. 工具输出会作为下一步 observation 加入对话。
@@ -80,7 +80,7 @@ graph TD
 
 ## 4. 奖励来自哪里
 
-GSM8K 工具在 `agent_r1/tool/tools/gsm8k.py` 中注册为 `calc_gsm8k_reward`。
+GSM8K 工具在 `recipes/gsm8k/tool.py` 中注册为 `calc_gsm8k_reward`。
 
 它在这个示例中的作用是：
 

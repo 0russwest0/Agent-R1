@@ -101,7 +101,7 @@ class Calculator(BaseTool):
 
 - `agent_r1/env/envs/tool.py`
 - `agent_r1/tool/base.py`
-- `agent_r1/tool/tools/gsm8k.py`
+- `recipes/gsm8k/tool.py`
 
 ## 当前版本最重要的点
 

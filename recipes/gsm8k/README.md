@@ -11,8 +11,7 @@ Official dataset reference: https://huggingface.co/datasets/openai/gsm8k. Proces
 - `base.yaml`: AgentEnvLoop configuration for the GSM8K + Tool example.
 - `prompts.py`: Prompt templates for plain and tool runs.
 - `reward_fn.py`: Recipe-local GSM8K rule reward wrapper.
-- `gsm8k_tool_loop.py`: Thin recipe-local registration shim around the generic `AgentEnvLoop`.
-- `env/gsm8k_tool_env.py`: Dynamically builds tool-use prompts during rollout.
+- `tool.py`: Recipe-local `calc_gsm8k_reward` tool.
 - `data_preprocess/process_gsm8k.py`: Converts raw GSM8K examples into standard train/test parquet files.
 - `data_preprocess/process_gsm8k_agent.py`: Converts raw GSM8K examples into tool train/test parquet files.
 - `examples/gsm8k/run_steppo.sh`: Single-turn StepPO test script using the plain data.
@@ -33,7 +32,7 @@ Expected processed files:
 - Plain PPO path: `$HOME/data/gsm8k/train.parquet` and `$HOME/data/gsm8k/test.parquet`.
 - Tool path: `$HOME/data/gsm8k_agent/train.parquet` and `$HOME/data/gsm8k_agent/test.parquet`.
 
-Each processed row follows the verl RLHFDataset style with `prompt`, `reward_model`, and `extra_info`. The tool version also stores structured `question` and `ground_truth` fields so `GSM8KToolEnv` can build prompts dynamically during rollout.
+Each processed row follows the verl RLHFDataset style with `prompt`, `reward_model`, and `extra_info`. The tool version stores a tool-calling chat prompt and `env_kwargs.tools_kwargs.ground_truth` so the reward tool can check answers during rollout.
 
 ## Data Preparation
 
@@ -51,7 +50,7 @@ Use `--local_dataset_path` if the raw dataset has already been downloaded locall
 
 ## Environment Setup
 
-No external environment server is required. The tool path uses the generic `AgentEnvLoop`, the thin recipe-local `GSM8KToolLoop` registration shim, `recipes.gsm8k.env.gsm8k_tool_env.GSM8KToolEnv`, tool format `hermes`, and the existing `calc_gsm8k_reward` tool.
+No external environment server is required. The tool path uses the generic `AgentEnvLoop`, the built-in `ToolEnv`, tool format `hermes`, and the recipe-local `calc_gsm8k_reward` tool.
 
 ## Training Scripts
 
@@ -73,8 +72,7 @@ bash examples/gsm8k/run_steppo_tool.sh trainer.total_epochs=1
 - Prompt templates: `recipes/gsm8k/prompts.py`.
 - Recipe reward: `recipes/gsm8k/reward_fn.py`.
 - Agent configuration: `recipes/gsm8k/base.yaml`.
-- Registration shim: `recipes/gsm8k/gsm8k_tool_loop.py`.
-- Tool environment: `recipes/gsm8k/env/gsm8k_tool_env.py`.
+- Tool definition: `recipes/gsm8k/tool.py`.
 
 ## Outputs And Evaluation
 

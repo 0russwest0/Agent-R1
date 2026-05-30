@@ -14,8 +14,7 @@
 """
 Preprocess the GSM8K dataset to parquet format for the GSM8K + Tool pipeline.
 
-The output keeps task fields structured so the recipe-local GSM8K environment
-can build prompts dynamically at rollout time.
+The output stores a tool-calling chat prompt and tool kwargs for the built-in ToolEnv.
 """
 
 import argparse
@@ -28,7 +27,7 @@ from pathlib import Path
 if __package__ is None or __package__ == "":
     sys.path.append(str(Path(__file__).resolve().parents[3]))
 
-from recipes.gsm8k.prompts import build_plain_messages
+from recipes.gsm8k.prompts import build_agent_messages
 
 
 def extract_solution(solution_str):
@@ -73,7 +72,7 @@ if __name__ == "__main__":
             data = {
                 "data_source": data_source,
                 "agent_name": "gsm8k_agent",
-                "prompt": build_plain_messages(question_raw),
+                "prompt": build_agent_messages(question_raw),
                 "question": question_raw,
                 "ground_truth": solution,
                 "ability": "math",

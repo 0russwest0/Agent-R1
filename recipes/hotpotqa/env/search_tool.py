@@ -152,8 +152,7 @@ class PassagePool:
 
 class HotpotQASearchToolLegacy:
     """
-    Local HotpotQA FAISS retrieval; behavior matches the production-validated implementation in
-    `Agent-R1/agent_r1/tool/tools/search_tool.py` (SearchTool).
+    Local HotpotQA FAISS retrieval; behavior matches the production-validated legacy SearchTool.
 
     Extensions vs. upstream (success-path semantics unchanged):
     - Data layout: `HOTPOTQA_CORPUS_DATA_ROOT` + `index.bin` / `hpqa_corpus.jsonl`

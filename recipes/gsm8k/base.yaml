@@ -1,6 +1,6 @@
 - name: gsm8k_agent
-  _target_: recipes.gsm8k.gsm8k_tool_loop.GSM8KToolLoop
-  env_type: gsm8k_agent
+  _target_: recipes.gsm8k.AgentEnvLoop
+  env_type: tool
   tools:
     - calc_gsm8k_reward
   tool_format: hermes
