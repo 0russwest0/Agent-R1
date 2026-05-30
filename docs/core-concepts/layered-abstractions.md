@@ -101,7 +101,7 @@ The relevant implementation lives in:
 
 - `agent_r1/env/envs/tool.py`
 - `agent_r1/tool/base.py`
-- `recipes/gsm8k/tools.py`
+- `agent_r1/tool/tools/gsm8k.py`
 
 ## What Matters in This Version
 

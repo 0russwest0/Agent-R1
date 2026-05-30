@@ -1,4 +1,3 @@
-import importlib
 import json
 import logging
 import os
@@ -33,8 +32,6 @@ class AgentEnvLoop(AgentFlowBase):
     - **Global defaults** come from this flow's constructor ``**kwargs``
       (typically provided via a separate YAML loaded from
       ``config.actor_rollout_ref.rollout.agent.agent_flow_config_path``).
-    - **Registration imports** can be listed in ``env_imports`` when recipe
-      modules need to register ``AgentEnv`` or ``BaseTool`` implementations.
     - **Per-sample overrides** come from the ``env_kwargs`` field in the
       dataset row (passed through ``**kwargs``).
     - The two dicts are merged (per-sample wins), and ``env_type`` is popped
@@ -47,12 +44,7 @@ class AgentEnvLoop(AgentFlowBase):
         self.response_length = self.config.actor_rollout_ref.rollout.response_length
         self.max_steps: int = self.config.actor_rollout_ref.rollout.agent.get("max_steps", 10)
         self.skip_special_tokens: bool = self.config.actor_rollout_ref.rollout.agent.get("skip_special_tokens", True)
-        self.env_kwargs: dict[str, Any] = dict(kwargs)
-        env_imports = self.env_kwargs.pop("env_imports", [])
-        if isinstance(env_imports, str):
-            env_imports = [env_imports]
-        for module_name in env_imports:
-            importlib.import_module(module_name)
+        self.env_kwargs: dict[str, Any] = kwargs
 
     def _create_env(self, **kwargs) -> AgentEnv:
         """Create an environment instance for a single trajectory.

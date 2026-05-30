@@ -1,21 +1,21 @@
-from __future__ import annotations
-
 from typing import Any
 
-from agent_r1.tool import BaseTool, ToolResponse
 from verl.utils.reward_score import gsm8k
+
+from ..base import BaseTool
+from ..schema import ToolResponse
 
 
 @BaseTool.register("calc_gsm8k_reward")
 class GSM8KTool(BaseTool):
     name: str = "calc_gsm8k_reward"
-    description: str = "A tool for calculating the reward of GSM8K answers."
+    description: str = "A tool for calculating the reward of gsm8k"
     parameters: dict[str, Any] = {
         "type": "object",
         "properties": {
             "answer": {
                 "type": "string",
-                "description": "The answer to the question.",
+                "description": "The answer to the question",
             },
         },
         "required": ["answer"],
@@ -33,6 +33,7 @@ class GSM8KTool(BaseTool):
         # Support both flat and tool-namespaced layouts:
         # - tools_kwargs["ground_truth"] = "..."
         # - tools_kwargs["calc_gsm8k_reward"]["ground_truth"] = "..."
+
         ground_truth = None
         if "ground_truth" in tools_kwargs:
             ground_truth = tools_kwargs["ground_truth"]

@@ -80,7 +80,7 @@ More concretely:
 
 ## 4. Where the Reward Comes From
 
-The recipe-local GSM8K tool is registered as `calc_gsm8k_reward` in `recipes/gsm8k/tools.py`.
+The GSM8K tool is registered as `calc_gsm8k_reward` in `agent_r1/tool/tools/gsm8k.py`.
 
 Its role in this example is to:
 

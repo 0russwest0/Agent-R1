@@ -80,7 +80,7 @@ graph TD
 
 ## 4. 奖励来自哪里
 
-recipe-local GSM8K 工具在 `recipes/gsm8k/tools.py` 中注册为 `calc_gsm8k_reward`。
+GSM8K 工具在 `agent_r1/tool/tools/gsm8k.py` 中注册为 `calc_gsm8k_reward`。
 
 它在这个示例中的作用是：
 

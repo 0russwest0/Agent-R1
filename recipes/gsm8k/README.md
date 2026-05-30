@@ -11,8 +11,8 @@ Official dataset reference: https://huggingface.co/datasets/openai/gsm8k. Proces
 - `base.yaml`: AgentEnvLoop configuration for the GSM8K + Tool example.
 - `prompts.py`: Prompt templates for plain and tool runs.
 - `reward_fn.py`: Recipe-local GSM8K rule reward wrapper.
+- `gsm8k_tool_loop.py`: Thin recipe-local registration shim around the generic `AgentEnvLoop`.
 - `env/gsm8k_tool_env.py`: Dynamically builds tool-use prompts during rollout.
-- `tools.py`: Recipe-local `calc_gsm8k_reward` tool.
 - `data_preprocess/process_gsm8k.py`: Converts raw GSM8K examples into standard train/test parquet files.
 - `data_preprocess/process_gsm8k_agent.py`: Converts raw GSM8K examples into tool train/test parquet files.
 - `examples/gsm8k/run_grpo.sh`: GRPO training script using the agent data.
@@ -51,7 +51,7 @@ Use `--local_dataset_path` if the raw dataset has already been downloaded locall
 
 ## Environment Setup
 
-No external environment server is required. The tool path uses the generic `AgentEnvLoop`, `recipes.gsm8k.env.gsm8k_tool_env.GSM8KToolEnv`, tool format `hermes`, and the recipe-local `calc_gsm8k_reward` tool.
+No external environment server is required. The tool path uses the generic `AgentEnvLoop`, the thin recipe-local `GSM8KToolLoop` registration shim, `recipes.gsm8k.env.gsm8k_tool_env.GSM8KToolEnv`, tool format `hermes`, and the existing `calc_gsm8k_reward` tool.
 
 ## Training Scripts
 
@@ -73,8 +73,8 @@ bash examples/gsm8k/run_grpo.sh trainer.total_epochs=1
 - Prompt templates: `recipes/gsm8k/prompts.py`.
 - Recipe reward: `recipes/gsm8k/reward_fn.py`.
 - Agent configuration: `recipes/gsm8k/base.yaml`.
+- Registration shim: `recipes/gsm8k/gsm8k_tool_loop.py`.
 - Tool environment: `recipes/gsm8k/env/gsm8k_tool_env.py`.
-- Tool definition: `recipes/gsm8k/tools.py`.
 
 ## Outputs And Evaluation
 
