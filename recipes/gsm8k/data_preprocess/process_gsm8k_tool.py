@@ -48,7 +48,7 @@ if __name__ == "__main__":
     parser.add_argument("--hdfs_dir", default=None)
     parser.add_argument("--local_dataset_path", default=None, help="The local path to the raw dataset, if it exists.")
     parser.add_argument(
-        "--local_save_dir", default="~/data/gsm8k_agent", help="The save directory for the preprocessed dataset."
+        "--local_save_dir", default="~/data/gsm8k_tool", help="The save directory for the preprocessed dataset."
     )
 
     args = parser.parse_args()
@@ -71,7 +71,7 @@ if __name__ == "__main__":
             solution = extract_solution(answer_raw)
             data = {
                 "data_source": data_source,
-                "agent_name": "gsm8k_agent",
+                "agent_name": "gsm8k_tool",
                 "prompt": build_agent_messages(question_raw),
                 "question": question_raw,
                 "ground_truth": solution,

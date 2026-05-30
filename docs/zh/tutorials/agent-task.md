@@ -8,26 +8,26 @@
 
 本教程使用两个已有文件：
 
-- 数据预处理：[`recipes/gsm8k/data_preprocess/process_gsm8k_agent.py`](https://github.com/AgentR1/Agent-R1/blob/main/recipes/gsm8k/data_preprocess/process_gsm8k_agent.py)
+- 数据预处理：[`recipes/gsm8k/data_preprocess/process_gsm8k_tool.py`](https://github.com/AgentR1/Agent-R1/blob/main/recipes/gsm8k/data_preprocess/process_gsm8k_tool.py)
 - 训练脚本：[`examples/gsm8k/run_steppo_tool.sh`](https://github.com/AgentR1/Agent-R1/blob/main/examples/gsm8k/run_steppo_tool.sh)
 
-## 1. 准备智能体数据集
+## 1. 准备工具数据集
 
 生成工具增强的 GSM8K 数据：
 
 ```bash
-python3 -m recipes.gsm8k.data_preprocess.process_gsm8k_agent --local_save_dir ~/data/gsm8k_agent
+python3 -m recipes.gsm8k.data_preprocess.process_gsm8k_tool --local_save_dir ~/data/gsm8k_tool
 ```
 
-相比单步 sanity-check 数据，这个预处理脚本会为 agent path 保留结构化任务字段：
+相比单步 sanity-check 数据，这个预处理脚本会为 tool path 保留结构化任务字段：
 
-- `agent_name: "gsm8k_agent"`
-- `question` 和 `ground_truth`，让 recipe 环境可以在 rollout 时动态构建 prompt
+- `agent_name: "gsm8k_tool"`
+- `question` 和 `ground_truth`，以及保存在 `prompt` 中的工具调用提示
 - `env_kwargs`，用于保存每个样本的工具元数据，例如 ground-truth answer
 
 概念上，每个样本会表达：
 
-1. 使用配置中的 `gsm8k_agent` 入口，这个入口指向通用 `AgentEnvLoop`
+1. 使用配置中的 `gsm8k_tool` 入口，这个入口指向通用 `AgentEnvLoop`
 2. 实例化内置 tool environment
 3. 在环境中暴露 `calc_gsm8k_reward` 工具
 
@@ -42,15 +42,15 @@ bash examples/gsm8k/run_steppo_tool.sh
 这个脚本会把 rollout 从单步生成切换到通用 agent-environment loop：
 
 ```bash
-actor_rollout_ref.rollout.agent.default_agent_flow=gsm8k_agent \
+actor_rollout_ref.rollout.agent.default_agent_flow=gsm8k_tool \
 actor_rollout_ref.rollout.agent.max_steps=5 \
 ```
 
-同时，它会把 trainer 指向 agent 数据集：
+同时，它会把 trainer 指向 tool 数据集：
 
 ```bash
-data.train_files=$HOME/data/gsm8k_agent/train.parquet \
-data.val_files=$HOME/data/gsm8k_agent/test.parquet \
+data.train_files=$HOME/data/gsm8k_tool/train.parquet \
+data.val_files=$HOME/data/gsm8k_tool/test.parquet \
 ```
 
 ## 3. 一条轨迹中会发生什么

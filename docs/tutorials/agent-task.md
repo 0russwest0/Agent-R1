@@ -8,26 +8,26 @@ The example uses GSM8K, but the important part is not the benchmark itself. The 
 
 This tutorial uses two existing files:
 
-- dataset preprocessing: [`recipes/gsm8k/data_preprocess/process_gsm8k_agent.py`](https://github.com/AgentR1/Agent-R1/blob/main/recipes/gsm8k/data_preprocess/process_gsm8k_agent.py)
+- dataset preprocessing: [`recipes/gsm8k/data_preprocess/process_gsm8k_tool.py`](https://github.com/AgentR1/Agent-R1/blob/main/recipes/gsm8k/data_preprocess/process_gsm8k_tool.py)
 - training script: [`examples/gsm8k/run_steppo_tool.sh`](https://github.com/AgentR1/Agent-R1/blob/main/examples/gsm8k/run_steppo_tool.sh)
 
-## 1. Prepare the Agent Dataset
+## 1. Prepare the Tool Dataset
 
 Generate the tool-augmented GSM8K dataset:
 
 ```bash
-python3 -m recipes.gsm8k.data_preprocess.process_gsm8k_agent --local_save_dir ~/data/gsm8k_agent
+python3 -m recipes.gsm8k.data_preprocess.process_gsm8k_tool --local_save_dir ~/data/gsm8k_tool
 ```
 
-Compared with the single-step sanity-check dataset, this preprocessing script keeps structured task fields for the agent path:
+Compared with the single-step sanity-check dataset, this preprocessing script keeps structured task fields for the tool path:
 
-- `agent_name: "gsm8k_agent"`
-- `question` and `ground_truth`, which let the recipe environment build prompts dynamically
+- `agent_name: "gsm8k_tool"`
+- `question` and `ground_truth`, plus a tool-calling prompt stored in `prompt`
 - `env_kwargs` for per-sample tool metadata such as the ground-truth answer
 
 Conceptually, each sample says:
 
-1. use the configured `gsm8k_agent` entry, which points to the generic `AgentEnvLoop`
+1. use the configured `gsm8k_tool` entry, which points to the generic `AgentEnvLoop`
 2. instantiate the built-in tool environment
 3. expose the `calc_gsm8k_reward` tool inside that environment
 
@@ -42,15 +42,15 @@ bash examples/gsm8k/run_steppo_tool.sh
 This script switches the rollout from single-step generation to the generic agent-environment loop:
 
 ```bash
-actor_rollout_ref.rollout.agent.default_agent_flow=gsm8k_agent \
+actor_rollout_ref.rollout.agent.default_agent_flow=gsm8k_tool \
 actor_rollout_ref.rollout.agent.max_steps=5 \
 ```
 
 It also points the trainer to the tool dataset:
 
 ```bash
-data.train_files=$HOME/data/gsm8k_agent/train.parquet \
-data.val_files=$HOME/data/gsm8k_agent/test.parquet \
+data.train_files=$HOME/data/gsm8k_tool/train.parquet \
+data.val_files=$HOME/data/gsm8k_tool/test.parquet \
 ```
 
 ## 3. What Happens During One Trajectory

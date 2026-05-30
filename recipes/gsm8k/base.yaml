@@ -1,4 +1,4 @@
-- name: gsm8k_agent
+- name: gsm8k_tool
   _target_: recipes.gsm8k.AgentEnvLoop
   env_type: tool
   tools:

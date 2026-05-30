@@ -13,7 +13,7 @@ Official dataset reference: https://huggingface.co/datasets/openai/gsm8k. Proces
 - `reward_fn.py`: Recipe-local GSM8K rule reward wrapper.
 - `tool.py`: Recipe-local `calc_gsm8k_reward` tool.
 - `data_preprocess/process_gsm8k.py`: Converts raw GSM8K examples into standard train/test parquet files.
-- `data_preprocess/process_gsm8k_agent.py`: Converts raw GSM8K examples into tool train/test parquet files.
+- `data_preprocess/process_gsm8k_tool.py`: Converts raw GSM8K examples into tool train/test parquet files.
 - `examples/gsm8k/run_steppo.sh`: Single-turn StepPO test script using the plain data.
 - `examples/gsm8k/run_steppo_tool.sh`: Multi-turn StepPO test script using the tool data.
 
@@ -30,7 +30,7 @@ pip install -r recipes/gsm8k/requirements.txt
 Expected processed files:
 
 - Plain PPO path: `$HOME/data/gsm8k/train.parquet` and `$HOME/data/gsm8k/test.parquet`.
-- Tool path: `$HOME/data/gsm8k_agent/train.parquet` and `$HOME/data/gsm8k_agent/test.parquet`.
+- Tool path: `$HOME/data/gsm8k_tool/train.parquet` and `$HOME/data/gsm8k_tool/test.parquet`.
 
 Each processed row follows the verl RLHFDataset style with `prompt`, `reward_model`, and `extra_info`. The tool version stores a tool-calling chat prompt and `env_kwargs.tools_kwargs.ground_truth` so the reward tool can check answers during rollout.
 
@@ -42,8 +42,8 @@ Download the processed release from [ModelScope](https://www.modelscope.cn/datas
 python recipes/gsm8k/data_preprocess/process_gsm8k.py \
   --local_save_dir "$HOME/data/gsm8k"
 
-python recipes/gsm8k/data_preprocess/process_gsm8k_agent.py \
-  --local_save_dir "$HOME/data/gsm8k_agent"
+python recipes/gsm8k/data_preprocess/process_gsm8k_tool.py \
+  --local_save_dir "$HOME/data/gsm8k_tool"
 ```
 
 Use `--local_dataset_path` if the raw dataset has already been downloaded locally.
@@ -68,10 +68,10 @@ bash examples/gsm8k/run_steppo_tool.sh trainer.total_epochs=1
 ## Core Code Entry Points
 
 - Plain data conversion: `recipes/gsm8k/data_preprocess/process_gsm8k.py`.
-- Agent data conversion: `recipes/gsm8k/data_preprocess/process_gsm8k_agent.py`.
+- Tool data conversion: `recipes/gsm8k/data_preprocess/process_gsm8k_tool.py`.
 - Prompt templates: `recipes/gsm8k/prompts.py`.
 - Recipe reward: `recipes/gsm8k/reward_fn.py`.
-- Agent configuration: `recipes/gsm8k/base.yaml`.
+- Tool rollout configuration: `recipes/gsm8k/base.yaml`.
 - Tool definition: `recipes/gsm8k/tool.py`.
 
 ## Outputs And Evaluation

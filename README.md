@@ -113,7 +113,7 @@ This stage is only a **setup check**. It helps confirm that your environment, mo
 GSM8K + Tool is the simplest `ToolEnv + BaseTool` example. Use the processed GSM8K tool files from the data release, or regenerate the tool-augmented dataset locally, then launch the multi-step tool-calling script:
 
 ```bash
-python3 -m recipes.gsm8k.data_preprocess.process_gsm8k_agent --local_save_dir ~/data/gsm8k_agent
+python3 -m recipes.gsm8k.data_preprocess.process_gsm8k_tool --local_save_dir ~/data/gsm8k_tool
 bash examples/gsm8k/run_steppo_tool.sh
 ```
 

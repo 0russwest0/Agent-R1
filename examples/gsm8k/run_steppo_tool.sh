@@ -12,8 +12,8 @@ EXP_NAME="${EXP_NAME:-gsm8k_steppo_tool}"
 
 python3 -m agent_r1.trainer.main_agent_ppo \
     algorithm.adv_estimator=gae \
-    data.train_files=$HOME/data/gsm8k_agent/train.parquet \
-    data.val_files=$HOME/data/gsm8k_agent/test.parquet \
+    data.train_files=$HOME/data/gsm8k_tool/train.parquet \
+    data.val_files=$HOME/data/gsm8k_tool/test.parquet \
     data.train_batch_size=256 \
     data.max_prompt_length=4096 \
     data.max_response_length=2048 \
@@ -40,7 +40,7 @@ python3 -m agent_r1.trainer.main_agent_ppo \
     actor_rollout_ref.rollout.prompt_length=4096 \
     actor_rollout_ref.rollout.response_length=2048 \
     actor_rollout_ref.rollout.agent.agent_flow_config_path="$CONFIG_PATH" \
-    actor_rollout_ref.rollout.agent.default_agent_flow=gsm8k_agent \
+    actor_rollout_ref.rollout.agent.default_agent_flow=gsm8k_tool \
     actor_rollout_ref.rollout.agent.max_steps=5 \
     actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=8 \
     actor_rollout_ref.ref.fsdp_config.param_offload=True \
