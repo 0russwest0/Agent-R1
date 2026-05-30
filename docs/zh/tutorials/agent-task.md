@@ -9,7 +9,7 @@
 本教程使用两个已有文件：
 
 - 数据预处理：[`recipes/gsm8k/data_preprocess/process_gsm8k_agent.py`](https://github.com/AgentR1/Agent-R1/blob/main/recipes/gsm8k/data_preprocess/process_gsm8k_agent.py)
-- 训练脚本：[`examples/gsm8k/run_grpo.sh`](https://github.com/AgentR1/Agent-R1/blob/main/examples/gsm8k/run_grpo.sh)
+- 训练脚本：[`examples/gsm8k/run_steppo_tool.sh`](https://github.com/AgentR1/Agent-R1/blob/main/examples/gsm8k/run_steppo_tool.sh)
 
 ## 1. 准备智能体数据集
 
@@ -36,7 +36,7 @@ python3 -m recipes.gsm8k.data_preprocess.process_gsm8k_agent --local_save_dir ~/
 运行：
 
 ```bash
-bash examples/gsm8k/run_grpo.sh
+bash examples/gsm8k/run_steppo_tool.sh
 ```
 
 这个脚本会把 rollout 从单步生成切换到通用 agent-environment loop：

@@ -9,7 +9,7 @@ The example uses GSM8K, but the important part is not the benchmark itself. The 
 This tutorial uses two existing files:
 
 - dataset preprocessing: [`recipes/gsm8k/data_preprocess/process_gsm8k_agent.py`](https://github.com/AgentR1/Agent-R1/blob/main/recipes/gsm8k/data_preprocess/process_gsm8k_agent.py)
-- training script: [`examples/gsm8k/run_grpo.sh`](https://github.com/AgentR1/Agent-R1/blob/main/examples/gsm8k/run_grpo.sh)
+- training script: [`examples/gsm8k/run_steppo_tool.sh`](https://github.com/AgentR1/Agent-R1/blob/main/examples/gsm8k/run_steppo_tool.sh)
 
 ## 1. Prepare the Agent Dataset
 
@@ -36,7 +36,7 @@ Conceptually, each sample says:
 Run:
 
 ```bash
-bash examples/gsm8k/run_grpo.sh
+bash examples/gsm8k/run_steppo_tool.sh
 ```
 
 This script switches the rollout from single-step generation to the generic agent-environment loop:

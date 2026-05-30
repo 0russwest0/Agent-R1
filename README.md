@@ -81,7 +81,7 @@ The recommended path is:
 
 1. Read the [Getting Started](https://agentr1.github.io/Agent-R1/getting-started/) page for the minimal setup flow.
 2. Download the processed data release from [ModelScope](https://www.modelscope.cn/datasets/Melmaphother/Agent-R1-data), then place or symlink each task's files to the paths expected by the corresponding recipe.
-3. Use [`examples/gsm8k/run_ppo.sh`](examples/gsm8k/run_ppo.sh) as a sanity check that the environment is wired correctly.
+3. Use [`examples/gsm8k/run_steppo.sh`](examples/gsm8k/run_steppo.sh) as a sanity check that the environment is wired correctly.
 4. Move to the [Agent Task Tutorial](https://agentr1.github.io/Agent-R1/tutorials/agent-task/) for the minimal GSM8K + Tool example based on `ToolEnv + BaseTool`.
 5. Read [Recipes and Algorithms](https://agentr1.github.io/Agent-R1/tutorials/recipes-and-algorithms/) for the current task integrations and launch-script layout.
 
@@ -103,7 +103,7 @@ Use the processed GSM8K files from the data release, or regenerate a minimal GSM
 
 ```bash
 python3 -m recipes.gsm8k.data_preprocess.process_gsm8k --local_save_dir ~/data/gsm8k
-bash examples/gsm8k/run_ppo.sh
+bash examples/gsm8k/run_steppo.sh
 ```
 
 This stage is only a **setup check**. It helps confirm that your environment, model path, dataset path, and training stack are wired correctly.
@@ -114,7 +114,7 @@ GSM8K + Tool is the simplest `ToolEnv + BaseTool` example. Use the processed GSM
 
 ```bash
 python3 -m recipes.gsm8k.data_preprocess.process_gsm8k_agent --local_save_dir ~/data/gsm8k_agent
-bash examples/gsm8k/run_grpo.sh
+bash examples/gsm8k/run_steppo_tool.sh
 ```
 
 This path uses the generic `AgentEnvLoop` with the recipe-local `GSM8KToolEnv` and `calc_gsm8k_reward` tool. The plain GSM8K script remains a single-turn environment sanity check.

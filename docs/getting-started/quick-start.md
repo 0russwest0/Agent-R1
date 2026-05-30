@@ -32,7 +32,7 @@ This produces:
 Use the provided single-step script:
 
 ```bash
-bash examples/gsm8k/run_ppo.sh
+bash examples/gsm8k/run_steppo.sh
 ```
 
 If needed, adjust the following values before running:
@@ -41,7 +41,7 @@ If needed, adjust the following values before running:
 - `actor_rollout_ref.model.path`
 - dataset paths under `~/data/gsm8k`
 
-The script entrypoint is [`examples/gsm8k/run_ppo.sh`](https://github.com/AgentR1/Agent-R1/blob/main/examples/gsm8k/run_ppo.sh), which launches `python3 -m agent_r1.trainer.main_agent_ppo`.
+The script entrypoint is [`examples/gsm8k/run_steppo.sh`](https://github.com/AgentR1/Agent-R1/blob/main/examples/gsm8k/run_steppo.sh), which launches `python3 -m agent_r1.trainer.main_agent_ppo` with the StepPO-style `gae` estimator.
 
 ## 3. What to Do Next
 

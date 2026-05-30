@@ -15,8 +15,8 @@ Official dataset reference: https://huggingface.co/datasets/openai/gsm8k. Proces
 - `env/gsm8k_tool_env.py`: Dynamically builds tool-use prompts during rollout.
 - `data_preprocess/process_gsm8k.py`: Converts raw GSM8K examples into standard train/test parquet files.
 - `data_preprocess/process_gsm8k_agent.py`: Converts raw GSM8K examples into tool train/test parquet files.
-- `examples/gsm8k/run_grpo.sh`: GRPO training script using the agent data.
-- `examples/gsm8k/run_ppo.sh`: PPO training script using the plain data.
+- `examples/gsm8k/run_steppo.sh`: Single-turn StepPO test script using the plain data.
+- `examples/gsm8k/run_steppo_tool.sh`: Multi-turn StepPO test script using the tool data.
 
 ## Additional Requirements
 
@@ -56,14 +56,14 @@ No external environment server is required. The tool path uses the generic `Agen
 ## Training Scripts
 
 ```bash
-bash examples/gsm8k/run_ppo.sh
-bash examples/gsm8k/run_grpo.sh
+bash examples/gsm8k/run_steppo.sh
+bash examples/gsm8k/run_steppo_tool.sh
 ```
 
 Both scripts accept trailing Hydra overrides through `"$@"`, for example:
 
 ```bash
-bash examples/gsm8k/run_grpo.sh trainer.total_epochs=1
+bash examples/gsm8k/run_steppo_tool.sh trainer.total_epochs=1
 ```
 
 ## Core Code Entry Points

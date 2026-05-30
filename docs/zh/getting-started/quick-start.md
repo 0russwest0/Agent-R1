@@ -32,7 +32,7 @@ python3 -m recipes.gsm8k.data_preprocess.process_gsm8k --local_save_dir ~/data/g
 使用单步训练脚本：
 
 ```bash
-bash examples/gsm8k/run_ppo.sh
+bash examples/gsm8k/run_steppo.sh
 ```
 
 如果需要，请在运行前调整：
@@ -41,7 +41,7 @@ bash examples/gsm8k/run_ppo.sh
 - `actor_rollout_ref.model.path`
 - `~/data/gsm8k` 下的数据路径
 
-脚本入口是 [`examples/gsm8k/run_ppo.sh`](https://github.com/AgentR1/Agent-R1/blob/main/examples/gsm8k/run_ppo.sh)，它会启动 `python3 -m agent_r1.trainer.main_agent_ppo`。
+脚本入口是 [`examples/gsm8k/run_steppo.sh`](https://github.com/AgentR1/Agent-R1/blob/main/examples/gsm8k/run_steppo.sh)，它会使用 StepPO 风格的 `gae` estimator 启动 `python3 -m agent_r1.trainer.main_agent_ppo`。
 
 ## 3. 下一步
 

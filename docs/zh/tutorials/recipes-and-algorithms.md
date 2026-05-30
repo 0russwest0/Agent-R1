@@ -16,6 +16,8 @@ examples/<task>/run_gigpo.sh
 
 不是每个任务都需要所有脚本。PPO 和 StepPO 使用自己的启动配置，其他若干算法变体会复用 GRPO 风格的脚本结构，并通过不同 Hydra overrides 区分。
 
+GSM8K 会被刻意保持为轻量测试 recipe，只提供 `examples/gsm8k/run_steppo.sh` 作为单轮 sanity check，以及 `examples/gsm8k/run_steppo_tool.sh` 作为多轮 ToolEnv check。
+
 ## Recipe 结构
 
 大多数 recipe 遵循以下形状：

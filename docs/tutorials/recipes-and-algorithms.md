@@ -16,6 +16,8 @@ examples/<task>/run_gigpo.sh
 
 Not every task needs every script. PPO and StepPO use their own launch configuration, while several other algorithm variants share the GRPO-style script structure with different Hydra overrides.
 
+GSM8K is intentionally kept as a lightweight test recipe. It provides only `examples/gsm8k/run_steppo.sh` for the single-turn sanity check and `examples/gsm8k/run_steppo_tool.sh` for the multi-turn ToolEnv check.
+
 ## Recipe Layout
 
 Most recipes follow this shape:
