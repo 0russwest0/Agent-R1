@@ -360,8 +360,8 @@ def compute_reinforce_outcome_advantage(
             step_indices=step_indices,
             gamma=gamma,
         )
-        step_mask = response_mask.any(dim=-1).to(dtype=response_mask.dtype).unsqueeze(-1)
-        step_advantages = verl_F.masked_whiten(step_returns.unsqueeze(-1), step_mask).squeeze(-1)
+        # Whiten at step-level, matching compute_gae_advantage_return.
+        step_advantages = (step_returns - step_returns.mean()) / (step_returns.std() + 1e-8)
 
         returns = step_returns.unsqueeze(-1) * response_mask
         advantages = step_advantages.unsqueeze(-1) * response_mask
