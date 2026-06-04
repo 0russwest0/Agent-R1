@@ -130,6 +130,10 @@ def value_loss(config: CriticConfig, model_output, data: TensorDict, dp_group=No
     values = data["values"]
     returns = data["returns"]
     response_mask = data["response_mask"].to(bool)
+    global_batch_info = {}
+    for key in ("dp_size", "batch_num_tokens", "global_batch_size"):
+        if key in data.keys():
+            global_batch_info[key] = data[key]
 
     vf_loss, vf_clipfrac = compute_value_loss(
         vpreds=vpreds,
@@ -138,6 +142,7 @@ def value_loss(config: CriticConfig, model_output, data: TensorDict, dp_group=No
         response_mask=response_mask,
         cliprange_value=config.cliprange_value,
         loss_agg_mode=config.loss_agg_mode,
+        **global_batch_info,
     )
 
     metrics = {

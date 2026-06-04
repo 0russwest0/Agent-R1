@@ -35,6 +35,7 @@ from omegaconf import OmegaConf
 from tqdm import tqdm
 
 from agent_r1.trainer.ppo.metric_utils import compute_data_metrics
+from agent_r1.trainer.ppo.trajectory_batching import prepare_trajectory_mini_batch
 from verl import DataProto
 from verl.experimental.dataset.sampler import AbstractCurriculumSampler
 from verl.protocol import pad_dataproto_to_divisor
@@ -286,17 +287,17 @@ class RayAgentTrainer(RayPPOTrainer):
         rollout_config = self.config.actor_rollout_ref.rollout
         batch.meta_info["multi_turn"] = rollout_config.multi_turn.enable
         batch.meta_info["temperature"] = rollout_config.temperature
+        ppo_mini_batch_size = self.config.actor_rollout_ref.actor.ppo_mini_batch_size
+        ppo_mini_batch_size = ppo_mini_batch_size * self.config.actor_rollout_ref.rollout.n
         if self.use_legacy_worker_impl == "disable":
             from verl.utils import tensordict_utils as tu
             from verl.utils.py_functional import rename_dict
             from verl.workers.utils.padding import left_right_2_no_padding
 
             calculate_entropy = self.config.actor_rollout_ref.actor.entropy_coeff != 0.0
-            ppo_mini_batch_size = self.config.actor_rollout_ref.actor.ppo_mini_batch_size
-            ppo_mini_batch_size = ppo_mini_batch_size * self.config.actor_rollout_ref.rollout.n
             dp_size = self._get_dp_size(self.actor_rollout_wg, "actor")
-            assign_global_mini_batch_ids(batch, mini_batch_size=ppo_mini_batch_size, dp_size=dp_size)
-            batch_td = batch.to_tensordict()
+            update_batch = prepare_trajectory_mini_batch(batch, mini_batch_size=ppo_mini_batch_size, dp_size=dp_size)
+            batch_td = update_batch.to_tensordict()
             batch_td = left_right_2_no_padding(batch_td)
             ppo_epochs = self.config.actor_rollout_ref.actor.ppo_epochs
             seed = self.config.actor_rollout_ref.actor.data_loader_seed
@@ -305,6 +306,7 @@ class RayAgentTrainer(RayPPOTrainer):
                 batch_td,
                 calculate_entropy=calculate_entropy,
                 mini_batch_size=ppo_mini_batch_size,
+                num_mini_batch=update_batch.meta_info["num_mini_batch"],
                 epochs=ppo_epochs,
                 seed=seed,
                 dataloader_kwargs={"shuffle": shuffle},
@@ -316,20 +318,22 @@ class RayAgentTrainer(RayPPOTrainer):
             actor_output["perf/mfu/actor"] = actor_output.pop("actor/mfu")
             actor_output = DataProto.from_single_dict(data={}, meta_info={"metrics": actor_output})
         else:
-            actor_output = self.actor_rollout_wg.update_actor(batch)
+            dp_size = self._get_worker_group_dp_size(self.actor_rollout_wg, ("actor",))
+            update_batch = prepare_trajectory_mini_batch(batch, mini_batch_size=ppo_mini_batch_size, dp_size=dp_size)
+            actor_output = self.actor_rollout_wg.update_actor(update_batch)
         return actor_output
 
     def _update_critic(self, batch: DataProto) -> DataProto:
+        ppo_mini_batch_size = self.config.critic.ppo_mini_batch_size
+        ppo_mini_batch_size = ppo_mini_batch_size * self.config.actor_rollout_ref.rollout.n
         if self.use_legacy_worker_impl == "disable":
             from verl.utils import tensordict_utils as tu
             from verl.utils.py_functional import rename_dict
             from verl.workers.utils.padding import left_right_2_no_padding
 
-            ppo_mini_batch_size = self.config.critic.ppo_mini_batch_size
-            ppo_mini_batch_size = ppo_mini_batch_size * self.config.actor_rollout_ref.rollout.n
             dp_size = self._get_worker_group_dp_size(self.critic_wg, ("train", "critic"))
-            assign_global_mini_batch_ids(batch, mini_batch_size=ppo_mini_batch_size, dp_size=dp_size)
-            batch_td = batch.to_tensordict()
+            update_batch = prepare_trajectory_mini_batch(batch, mini_batch_size=ppo_mini_batch_size, dp_size=dp_size)
+            batch_td = update_batch.to_tensordict()
             batch_td = left_right_2_no_padding(batch_td)
             ppo_epochs = self.config.critic.ppo_epochs
             seed = self.config.critic.data_loader_seed
@@ -337,6 +341,7 @@ class RayAgentTrainer(RayPPOTrainer):
             tu.assign_non_tensor(
                 batch_td,
                 mini_batch_size=ppo_mini_batch_size,
+                num_mini_batch=update_batch.meta_info["num_mini_batch"],
                 epochs=ppo_epochs,
                 seed=seed,
                 dataloader_kwargs={"shuffle": shuffle},
@@ -349,7 +354,9 @@ class RayAgentTrainer(RayPPOTrainer):
             output["perf/mfu/critic"] = output.pop("critic/mfu")
             output = DataProto.from_single_dict(data={}, meta_info={"metrics": output})
         else:
-            output = self.critic_wg.update_critic(batch)
+            dp_size = self._get_worker_group_dp_size(self.critic_wg, ("critic",))
+            update_batch = prepare_trajectory_mini_batch(batch, mini_batch_size=ppo_mini_batch_size, dp_size=dp_size)
+            output = self.critic_wg.update_critic(update_batch)
         return output
 
     def _get_worker_group_dp_size(self, worker_group, roles: Sequence[str]) -> int:

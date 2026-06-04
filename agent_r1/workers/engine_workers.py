@@ -120,7 +120,11 @@ class TrainingWorker(VerlTrainingWorker):
         assert mini_batch_size is not None or num_mini_batch is not None
         assert dataloader_kwargs.keys() <= {"shuffle"}, f"Unsupported dataloader_kwargs: {dataloader_kwargs.keys()}"
 
-        unique_mini_batch_ids = torch.unique(mini_batch_ids, sorted=True).cpu()
+        if num_mini_batch is not None:
+            num_mini_batch = int(num_mini_batch)
+            unique_mini_batch_ids = torch.arange(num_mini_batch, dtype=torch.long)
+        else:
+            unique_mini_batch_ids = torch.unique(mini_batch_ids, sorted=True).cpu()
         total_num_iterations = len(unique_mini_batch_ids) * epochs
         shuffle = dataloader_kwargs.get("shuffle", False)
 

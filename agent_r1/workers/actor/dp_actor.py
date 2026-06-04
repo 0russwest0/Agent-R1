@@ -18,7 +18,10 @@ Agent-R1 local PPO actor overrides.
 import logging
 import os
 
+import torch
+
 from agent_r1.trainer.ppo.core_algos import agg_loss, get_policy_loss_fn
+from agent_r1.trainer.ppo.trajectory_batching import get_mini_batch_global_info, split_data_proto_by_mini_batch_id
 from verl import DataProto
 from verl.trainer.ppo.core_algos import kl_penalty
 from verl.utils.device import get_device_id
@@ -53,12 +56,26 @@ class DataParallelPPOActor(VerlDataParallelPPOActor):
             select_keys.append("rollout_is_weights")
         if "rollout_log_probs" in data.batch.keys():
             select_keys.append("rollout_log_probs")
+        has_planned_mini_batches = "mini_batch_id" in data.batch.keys()
+        if has_planned_mini_batches:
+            select_keys.extend(
+                [
+                    "mini_batch_id",
+                    "mini_batch_global_size",
+                    "mini_batch_global_token_num",
+                    "mini_batch_global_response_token_num",
+                    "sample_mask",
+                ]
+            )
 
         has_multi_modal_inputs = "multi_modal_inputs" in data.non_tensor_batch.keys()
         non_tensor_select_keys = ["multi_modal_inputs"] if has_multi_modal_inputs else []
 
         data = data.select(batch_keys=select_keys, non_tensor_batch_keys=non_tensor_select_keys)
-        mini_batches = data.split(self.config.ppo_mini_batch_size)
+        if has_planned_mini_batches:
+            mini_batches = split_data_proto_by_mini_batch_id(data)
+        else:
+            mini_batches = data.split(self.config.ppo_mini_batch_size)
         on_policy = len(mini_batches) == 1 and self.config.ppo_epochs == 1
 
         metrics = {
@@ -67,13 +84,35 @@ class DataParallelPPOActor(VerlDataParallelPPOActor):
         }
         for _ in range(self.config.ppo_epochs):
             for mini_batch in mini_batches:
+                use_global_mini_batch_info = "mini_batch_global_size" in mini_batch.batch.keys()
+                if use_global_mini_batch_info:
+                    global_info = get_mini_batch_global_info(mini_batch)
+                    if not hasattr(self.config, "global_batch_info") or self.config.global_batch_info is None:
+                        self.config.global_batch_info = {}
+                    dp_size = (
+                        torch.distributed.get_world_size() // self.ulysses_sequence_parallel_size
+                        if torch.distributed.is_initialized()
+                        else 1
+                    )
+                    self.config.global_batch_info.update(
+                        {
+                            "dp_size": dp_size,
+                            "batch_num_tokens": global_info["batch_num_tokens"],
+                            "global_batch_size": global_info["global_batch_size"],
+                            "loss_scale_factor": self.config.loss_scale_factor,
+                        }
+                    )
+                elif hasattr(self.config, "global_batch_info"):
+                    self.config.global_batch_info.clear()
+
                 if self.config.use_dynamic_bsz:
                     max_token_len = self.config.ppo_max_token_len_per_gpu * self.ulysses_sequence_parallel_size
                     micro_batches, _ = prepare_dynamic_batch(mini_batch, max_token_len=max_token_len)
                 else:
                     micro_batches = mini_batch.split(self.config.ppo_micro_batch_size_per_gpu)
 
-                micro_batches = [mb for mb in micro_batches if bool(mb.batch["response_mask"].any().item())]
+                if not has_planned_mini_batches:
+                    micro_batches = [mb for mb in micro_batches if bool(mb.batch["response_mask"].any().item())]
                 if not micro_batches:
                     append_to_dict(metrics, {"actor/grad_norm": 0.0})
                     continue
@@ -94,7 +133,9 @@ class DataParallelPPOActor(VerlDataParallelPPOActor):
                     loss_agg_mode = self.config.loss_agg_mode
                     calculate_entropy = self.config.calculate_entropy or (entropy_coeff != 0)
 
-                    if self.config.use_dynamic_bsz:
+                    if use_global_mini_batch_info:
+                        loss_scale_factor = 1.0
+                    elif self.config.use_dynamic_bsz:
                         loss_scale_factor = response_mask.shape[0] / self.config.ppo_mini_batch_size
                     else:
                         loss_scale_factor = 1 / self.gradient_accumulation
@@ -135,7 +176,12 @@ class DataParallelPPOActor(VerlDataParallelPPOActor):
 
                     policy_loss = pg_loss
                     if calculate_entropy and entropy is not None:
-                        entropy_agg = agg_loss(loss_mat=entropy, loss_mask=response_mask, loss_agg_mode=loss_agg_mode)
+                        entropy_agg = agg_loss(
+                            loss_mat=entropy,
+                            loss_mask=response_mask,
+                            loss_agg_mode=loss_agg_mode,
+                            **getattr(self.config, "global_batch_info", {}),
+                        )
                         micro_batch_metrics["actor/entropy"] = entropy_agg.detach().item()
                         if entropy_coeff != 0:
                             policy_loss -= entropy_agg * entropy_coeff
@@ -145,7 +191,12 @@ class DataParallelPPOActor(VerlDataParallelPPOActor):
                         kld = kl_penalty(
                             logprob=log_prob, ref_logprob=ref_log_prob, kl_penalty=self.config.kl_loss_type
                         )
-                        kl_loss = agg_loss(loss_mat=kld, loss_mask=response_mask, loss_agg_mode=loss_agg_mode)
+                        kl_loss = agg_loss(
+                            loss_mat=kld,
+                            loss_mask=response_mask,
+                            loss_agg_mode=loss_agg_mode,
+                            **getattr(self.config, "global_batch_info", {}),
+                        )
                         policy_loss = policy_loss + kl_loss * self.config.kl_loss_coef
                         metrics["actor/kl_loss"] += kl_loss.detach().item() * loss_scale_factor
                         micro_batch_metrics["actor/kl_coef"] = self.config.kl_loss_coef
