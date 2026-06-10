@@ -16,6 +16,7 @@ Unlike single-turn RL pipelines that treat interaction as one growing prompt-res
 
 ## News
 
+- [2026.05.30] **A substantially revised Agent-R1 technical report is released.** The updated report presents Agent-R1's step-level trajectory representation, flexible context management, and layered abstractions for agentic reinforcement learning. [[Paper](https://arxiv.org/abs/2511.14460)]
 - [2026.05.29] **Agent-R1 integrates [StepPO](https://arxiv.org/abs/2604.18401), expands recipe coverage, and releases processed data.** The framework now includes StepPO-style training support together with recipe integrations for HotpotQA, ALFWorld, WebShop, and academic paper search. Processed datasets are available on [ModelScope](https://www.modelscope.cn/datasets/Melmaphother/Agent-R1-data).
 - [2026.03.23] **Agent-R1 v0.1.0 is the first official release of the refactored architecture.** It introduces the **Step-level MDP** foundation and new **Layered Abstractions**. The previous implementation is archived on the `legacy` branch.
 - [2026.03.04] **[Claw-R1](https://agentr1.github.io/Claw-R1/) is released.** It extends Agentic RL to general agents such as OpenClaw through a middleware-style design. See [AgentR1/Claw-R1](https://github.com/AgentR1/Claw-R1).
@@ -185,14 +186,14 @@ This work is conducted at the **State Key Laboratory of Cognitive Intelligence, 
 If you find Agent-R1 useful in your research, please cite:
 
 ```bibtex
-@misc{cheng2025agentr1trainingpowerfulllm,
-  title={Agent-R1: Training Powerful LLM Agents with End-to-End Reinforcement Learning},
-  author={Mingyue Cheng and Jie Ouyang and Shuo Yu and Ruiran Yan and Yucong Luo and Zirui Liu and Daoyu Wang and Qi Liu and Enhong Chen},
-  year={2025},
-  eprint={2511.14460},
-  archivePrefix={arXiv},
-  primaryClass={cs.CL},
-  url={https://arxiv.org/abs/2511.14460}
+@misc{cheng2026agentr1unifiedmodularframework,
+      title={Agent-R1: A Unified and Modular Framework for Agentic Reinforcement Learning}, 
+      author={Mingyue Cheng and Shuo Yu and Daoyu Wang and Qingchuan Li and Xiaoyu Tao and Jie Ouyang and Yucong Luo and Yitong Zhou and Qi Liu and Enhong Chen},
+      year={2026},
+      eprint={2511.14460},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2511.14460}, 
 }
 ```
 

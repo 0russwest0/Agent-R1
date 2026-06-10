@@ -36,6 +36,13 @@ python3 -m agent_r1.trainer.main_agent_ppo \
     actor_rollout_ref.rollout.n=1 \
     actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=40 \
     actor_rollout_ref.ref.fsdp_config.param_offload=True \
+    critic.model.path=Qwen/Qwen2.5-3B-Instruct \
+    critic.optim.lr=1e-5 \
+    critic.model.use_remove_padding=True \
+    critic.model.enable_gradient_checkpointing=True \
+    critic.ppo_micro_batch_size_per_gpu=40 \
+    critic.model.fsdp_config.param_offload=False \
+    critic.model.fsdp_config.optimizer_offload=False \
     algorithm.use_kl_in_reward=False \
     custom_reward_function.path=recipes/gsm8k/reward_fn.py \
     custom_reward_function.name=compute_score \
