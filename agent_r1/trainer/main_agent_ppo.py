@@ -117,10 +117,9 @@ class TaskRunner:
 
     def add_actor_rollout_worker(self, config):
         """Add actor rollout worker using the unified model engine implementation."""
+        from agent_r1.workers.engine_workers import ActorRolloutRefWorker
         from verl.single_controller.ray import RayWorkerGroup
         from verl.trainer.ppo.ray_trainer import Role
-
-        from agent_r1.workers.engine_workers import ActorRolloutRefWorker
 
         actor_rollout_cls = ActorRolloutRefWorker
         ray_worker_group_cls = RayWorkerGroup
@@ -139,9 +138,8 @@ class TaskRunner:
 
     def add_critic_worker(self, config):
         """Add critic worker to role mapping using the unified model engine implementation."""
-        from verl.trainer.ppo.ray_trainer import Role
-
         from agent_r1.workers.engine_workers import TrainingWorker
+        from verl.trainer.ppo.ray_trainer import Role
 
         self.role_worker_mapping[Role.Critic] = ray.remote(TrainingWorker)
         self.mapping[Role.Critic] = "global_pool"

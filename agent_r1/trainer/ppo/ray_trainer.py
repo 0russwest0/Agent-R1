@@ -27,7 +27,6 @@ from pprint import pprint
 from typing import Optional
 
 import numpy as np
-import ray
 import torch
 from omegaconf import OmegaConf
 from tqdm import tqdm

@@ -125,7 +125,10 @@ class RewardLoopWorker:
                     return await self.reward_loop.run_single(data)
 
         # For now, only support DataProto-less inputs for DisRM.
-        if getattr(self.config, "custom_reward_function", None) is not None and self.config.reward.custom_reward_function.path:
+        if (
+            getattr(self.config, "custom_reward_function", None) is not None
+            and self.config.reward.custom_reward_function.path
+        ):
             raise NotImplementedError(
                 "RewardLoopWorker currently supports non-DataProto inputs only in the DisRM path. "
                 "When custom_reward_function is configured, you must pass DataProto."

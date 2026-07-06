@@ -30,8 +30,6 @@ from transformers import AutoProcessor, AutoTokenizer
 
 from agent_r1.reward_loop.reward_loop import RewardLoopWorker
 from verl.experimental.agent_loop.agent_loop import DictConfigWrap
-from verl.workers.rollout.llm_server import GlobalRequestLoadBalancer, LLMServerClient
-from verl.workers.rollout.utils import update_prometheus_config
 from verl.experimental.agent_loop.utils import resolve_config_path
 from verl.protocol import DataProto
 from verl.single_controller.ray.base import RayResourcePool, RayWorkerGroup
@@ -46,7 +44,9 @@ from verl.utils.rollout_trace import (
     rollout_trace_attr,
 )
 from verl.utils.transferqueue_utils import tqbridge
+from verl.workers.rollout.llm_server import GlobalRequestLoadBalancer, LLMServerClient
 from verl.workers.rollout.replica import get_rollout_replica_class
+from verl.workers.rollout.utils import update_prometheus_config
 
 logger = logging.getLogger(__file__)
 logger.setLevel(os.getenv("VERL_LOGGING_LEVEL", "WARN"))
@@ -501,6 +501,7 @@ class AgentFlowWorkerBase:
                 _agent_flow_registry[agent_flow_config.name] = agent_flow_config
                 if "_target_" in agent_flow_config:
                     import importlib
+
                     module_path = agent_flow_config["_target_"].rsplit(".", 1)[0]
                     importlib.import_module(module_path)
         if self.config.actor_rollout_ref.model.get("custom_chat_template", None) is not None:
@@ -780,9 +781,7 @@ class AgentFlowWorkerBase:
 class AgentFlowWorker(AgentFlowWorkerBase):
     """Agent flow worker takes a batch of messages and run each message in an agent flow."""
 
-    def __init__(
-        self, config: DictConfig, llm_client: LLMServerClient, reward_router_address: str = None
-    ):
+    def __init__(self, config: DictConfig, llm_client: LLMServerClient, reward_router_address: str = None):
         """Initialize agent flow manager.
         Args:
             config (DictConfig): YAML config.
