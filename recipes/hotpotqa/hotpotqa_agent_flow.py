@@ -35,7 +35,8 @@ from recipes.hotpotqa.prompts import (
     HOTPOTQA_TOOL_SCHEMAS,
     HOTPOTQA_USER_PROMPT,
 )
-from verl.experimental.agent_loop.agent_loop import AsyncLLMServerManager, DictConfigWrap
+from verl.experimental.agent_loop.agent_loop import DictConfigWrap
+from verl.workers.rollout.llm_server import LLMServerClient
 from verl.experimental.agent_loop.tool_parser import FunctionCall, ToolParser
 from verl.utils.profiler import simple_timer
 
@@ -158,7 +159,7 @@ class HotpotQAAgentFlow(AgentFlowBase):
     def __init__(
         self,
         trainer_config: DictConfigWrap,
-        server_manager: AsyncLLMServerManager,
+        server_manager: LLMServerClient,
         reward_loop_worker: RewardLoopWorker,
         tokenizer: AutoTokenizer,
         processor: AutoProcessor,

@@ -29,11 +29,9 @@ from tensordict import TensorDict
 from transformers import AutoProcessor, AutoTokenizer
 
 from agent_r1.reward_loop.reward_loop import RewardLoopWorker
-from verl.experimental.agent_loop.agent_loop import (
-    AsyncLLMServerManager,
-    DictConfigWrap,
-)
-from verl.experimental.agent_loop.prometheus_utils import update_prometheus_config
+from verl.experimental.agent_loop.agent_loop import DictConfigWrap
+from verl.workers.rollout.llm_server import GlobalRequestLoadBalancer, LLMServerClient
+from verl.workers.rollout.utils import update_prometheus_config
 from verl.experimental.agent_loop.utils import resolve_config_path
 from verl.protocol import DataProto
 from verl.single_controller.ray.base import RayResourcePool, RayWorkerGroup
@@ -133,7 +131,7 @@ class AgentFlowBase(ABC):
     def __init__(
         self,
         trainer_config: DictConfigWrap,
-        server_manager: AsyncLLMServerManager,
+        server_manager: LLMServerClient,
         reward_loop_worker: RewardLoopWorker,
         tokenizer: AutoTokenizer,
         processor: AutoProcessor,
@@ -145,7 +143,7 @@ class AgentFlowBase(ABC):
 
         Args:
             trainer_config (DictConfigWrap): trainer config.
-            server_manager (AsyncLLMServerManager): OpenAI compatible LLM server manager.
+            server_manager (LLMServerClient): LLM server client for generation requests.
             reward_loop_worker (RewardLoopWorker): Reward loop worker.
             tokenizer (AutoTokenizer): Tokenizer for tokenize messages.
             processor (AutoProcessor): Processor for process messages.
@@ -471,20 +469,20 @@ class AgentFlowWorkerBase:
     def __init__(
         self,
         config: DictConfig,
-        server_handles: list[ray.actor.ActorHandle],
+        llm_client: LLMServerClient,
         reward_router_address: str = None,
     ):
         """Initialize agent flow manager.
 
         Args:
             config (DictConfig): YAML config.
-            server_handles (List[ray.actor.ActorHandle]): OpenAI compatible LLM server actor handles.
+            llm_client (LLMServerClient): LLM server client for generation requests.
         """
         self.config = config
 
         # for recipe to change
         if not hasattr(self, "server_manager"):
-            self.server_manager = AsyncLLMServerManager(config, server_handles)
+            self.server_manager = llm_client
 
         self.dataset_cls = get_dataset_class(config.data)
         self.reward_router_address = reward_router_address
@@ -501,6 +499,10 @@ class AgentFlowWorkerBase:
             agent_flow_configs = OmegaConf.load(resolved_path)
             for agent_flow_config in agent_flow_configs:
                 _agent_flow_registry[agent_flow_config.name] = agent_flow_config
+                if "_target_" in agent_flow_config:
+                    import importlib
+                    module_path = agent_flow_config["_target_"].rsplit(".", 1)[0]
+                    importlib.import_module(module_path)
         if self.config.actor_rollout_ref.model.get("custom_chat_template", None) is not None:
             if self.processor is not None:
                 self.processor.chat_template = self.config.actor_rollout_ref.model.custom_chat_template
@@ -768,15 +770,10 @@ class AgentFlowWorkerBase:
         self,
     ):
         """Create a client for data system (TransferQueue)."""
-        from verl.single_controller.ray.base import get_random_string
-        from verl.utils.transferqueue_utils import create_transferqueue_client
+        import transfer_queue as tq
 
-        client_name = get_random_string(length=6)
-
-        self.tq_client = create_transferqueue_client(
-            client_id=f"AgentLoopWorker_{client_name}",
-            config=self.config.transfer_queue,
-        )
+        tq.init()
+        self.tq_client = tq.get_client()
 
 
 @ray.remote
@@ -784,15 +781,15 @@ class AgentFlowWorker(AgentFlowWorkerBase):
     """Agent flow worker takes a batch of messages and run each message in an agent flow."""
 
     def __init__(
-        self, config: DictConfig, server_handles: list[ray.actor.ActorHandle], reward_router_address: str = None
+        self, config: DictConfig, llm_client: LLMServerClient, reward_router_address: str = None
     ):
         """Initialize agent flow manager.
         Args:
             config (DictConfig): YAML config.
-            server_handles (List[ray.actor.ActorHandle]): OpenAI compatible LLM server actor handles.
+            llm_client (LLMServerClient): LLM server client for generation requests.
             reward_router_address (str): reward router address.
         """
-        super().__init__(config, server_handles, reward_router_address)
+        super().__init__(config, llm_client, reward_router_address)
 
 
 async def get_trajectory_info(step, index, validate):
@@ -834,10 +831,10 @@ class AgentFlowManager:
         self.worker_group = worker_group
         self.reward_model_manager = None
         self.reward_router_address = None
-        if self.config.reward_model.enable:
+        if self.config.reward.reward_model.enable:
             from verl.experimental.reward_loop import RewardModelManager
 
-            self.reward_model_manager = RewardModelManager(config.reward_model, rm_resource_pool)
+            self.reward_model_manager = RewardModelManager(config.reward.reward_model, rm_resource_pool)
             self.reward_router_address = self.reward_model_manager.get_router_address()
 
         # for recipe to change
@@ -890,7 +887,16 @@ class AgentFlowManager:
         if rollout_config.prometheus.enable:
             if rollout_config.disable_log_stats:
                 raise ValueError("PROMETHEUS needs disable_log_stats==False, but it is currently True.")
-            update_prometheus_config(rollout_config.prometheus, self.server_addresses)
+            update_prometheus_config(rollout_config.prometheus, self.server_addresses, rollout_config.name)
+
+        # Create global load balancer and LLM server client
+        self.global_load_balancer = GlobalRequestLoadBalancer.remote(
+            servers=dict(zip(self.server_addresses, self.server_handles, strict=True)),
+        )
+        self.llm_client = LLMServerClient(
+            config=self.config,
+            load_balancer_handle=self.global_load_balancer,
+        )
 
     def _init_agent_flow_workers(self):
         self.agent_flow_workers = []
@@ -906,7 +912,7 @@ class AgentFlowManager:
                     scheduling_strategy=ray.util.scheduling_strategies.NodeAffinitySchedulingStrategy(
                         node_id=node_id, soft=True
                     ),
-                ).remote(self.config, self.server_handles, self.reward_router_address)
+                ).remote(self.config, self.llm_client, self.reward_router_address)
             )
 
     def generate_sequences(self, prompts: DataProto) -> DataProto:
@@ -1014,8 +1020,18 @@ class AgentFlowManager:
         return timing
 
     def wake_up(self):
-        """Wake up all rollout replica instances."""
-        self._run_all([replica.wake_up() for replica in self.rollout_replicas])
+        """Sync training weights to vLLM and wake up rollout replicas.
+
+        In verl 0.8.0 the vLLMHttpServer.wake_up() only restores engine
+        state from sleep — it no longer calls the training workers to push
+        model weights.  We call update_weights(mode="naive") through the
+        worker group dispatch so the FSDP parameters are sent to the vLLM
+        engine via the ServerAdapter (matching the verl 0.7.0 behaviour).
+        """
+        if self.worker_group:
+            ray.get(self.worker_group.update_weights(mode="naive"))
+        else:
+            self._run_all([replica.wake_up() for replica in self.rollout_replicas])
 
     def sleep(self):
         """Sleep all rollout replica instances."""

@@ -132,6 +132,7 @@ class TrainingWorker(VerlTrainingWorker):
             self.engine.train_mode(disable_auto_offload=disable_auto_offload),
             Timer(name="train_batch", logger=None),
         ):
+            data = data.cpu()
             output_lst = []
             iteration_idx = 0
             for epoch in range(epochs):

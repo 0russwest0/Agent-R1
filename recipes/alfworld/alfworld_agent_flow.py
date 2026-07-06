@@ -18,7 +18,8 @@ from recipes.alfworld.utils import (
     build_invalid_tool_call_observation,
     extract_task_text,
 )
-from verl.experimental.agent_loop.agent_loop import AsyncLLMServerManager, DictConfigWrap
+from verl.experimental.agent_loop.agent_loop import DictConfigWrap
+from verl.workers.rollout.llm_server import LLMServerClient
 from verl.experimental.agent_loop.tool_parser import FunctionCall, ToolParser
 from verl.utils.profiler import simple_timer
 
@@ -62,7 +63,7 @@ class AlfworldAgentFlow(AgentFlowBase):
     def __init__(
         self,
         trainer_config: DictConfigWrap,
-        server_manager: AsyncLLMServerManager,
+        server_manager: LLMServerClient,
         reward_loop_worker: RewardLoopWorker,
         tokenizer: AutoTokenizer,
         processor: AutoProcessor,

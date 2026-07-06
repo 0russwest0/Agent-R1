@@ -20,7 +20,7 @@ import aiohttp
 import ray
 from omegaconf import DictConfig
 
-from verl.experimental.reward_loop.reward_loop import get_reward_manager_cls
+from verl.experimental.reward_loop.reward_manager import get_reward_manager_cls
 from verl.protocol import DataProto
 from verl.trainer.ppo.reward import get_custom_reward_fn
 from verl.utils import hf_tokenizer
@@ -59,24 +59,24 @@ class RewardLoopWorker:
         input_tokenizer_local_path = copy_to_local(self.config.actor_rollout_ref.model.path)
         self.input_tokenizer = hf_tokenizer(input_tokenizer_local_path, trust_remote_code=True)
         self.reward_model_tokenizer = None
-        if self.config.reward_model.enable:
-            reward_model_tokenizer_local_path = copy_to_local(self.config.reward_model.model.path)
+        if self.config.reward.reward_model.enable:
+            reward_model_tokenizer_local_path = copy_to_local(self.config.reward.reward_model.model.path)
             self.reward_model_tokenizer = hf_tokenizer(reward_model_tokenizer_local_path, trust_remote_code=True)
         self.reward_fn = get_custom_reward_fn(self.config)
 
         # Load reward loop manager class
         # Support both registry and importlib loading methods
-        reward_loop_source = self.config.reward_model.get("reward_loop_source", "register")
+        reward_loop_source = self.config.reward.reward_model.get("reward_loop_source", "register")
 
         if reward_loop_source == "register":
             # Load from registry (default behavior)
-            reward_manager_cls = get_reward_manager_cls(self.config.reward_model.reward_manager)
+            reward_manager_cls = get_reward_manager_cls(self.config.reward.reward_manager.name)
         elif reward_loop_source == "importlib":
             # Load from external module using importlib
             from verl.utils.import_utils import load_extern_object
 
-            reward_loop_module_path = self.config.reward_model.get("reward_loop_module_path", None)
-            reward_loop_class_name = self.config.reward_model.get("reward_loop_class_name", None)
+            reward_loop_module_path = self.config.reward.reward_model.get("reward_loop_module_path", None)
+            reward_loop_class_name = self.config.reward.reward_model.get("reward_loop_class_name", None)
 
             assert reward_loop_module_path is not None, (
                 "reward_loop_module_path must be set when reward_loop_source='importlib'"
@@ -113,11 +113,11 @@ class RewardLoopWorker:
         if isinstance(input_data, DataProto):
             data = input_data
             assert len(data) == 1, "RewardLoopWorker only support single data item"
-            if self.config.custom_reward_function.path is not None:
+            if self.config.reward.custom_reward_function.path is not None:
                 # directly use user-customized reward function
                 return await self.reward_loop.run_single(data)
             else:
-                if self.config.reward_model.enable:
+                if self.config.reward.reward_model.enable:
                     # we assume the rm is disrm
                     # genrm must set custom_reward_function
                     return await self.compute_score_disrm(data)
@@ -125,12 +125,12 @@ class RewardLoopWorker:
                     return await self.reward_loop.run_single(data)
 
         # For now, only support DataProto-less inputs for DisRM.
-        if getattr(self.config, "custom_reward_function", None) is not None and self.config.custom_reward_function.path:
+        if getattr(self.config, "custom_reward_function", None) is not None and self.config.reward.custom_reward_function.path:
             raise NotImplementedError(
                 "RewardLoopWorker currently supports non-DataProto inputs only in the DisRM path. "
                 "When custom_reward_function is configured, you must pass DataProto."
             )
-        if not self.config.reward_model.enable:
+        if not self.config.reward.reward_model.enable:
             raise NotImplementedError(
                 "RewardLoopWorker only supports non-DataProto inputs in DisRM mode. "
                 "Set reward_model.enable=True (and do not use custom_reward_function), or pass DataProto."
@@ -245,8 +245,8 @@ class RewardLoopWorker:
                     "Supported: DataProto | str | messages(list[dict])"
                 )
 
-        engine_name = self.config.reward_model.rollout.name
-        model_name = self.config.reward_model.model.path
+        engine_name = self.config.reward.reward_model.rollout.name
+        model_name = self.config.reward.reward_model.model.path
         if engine_name == "vllm":
             # TODO (dyy): the "activation" has been changed to "use_activation" in vllm 0.11.2
             payloads = {
