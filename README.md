@@ -170,9 +170,23 @@ Typical migration checklist:
 
 Generic on-policy distillation (OPD) support is maintained on the `opd` branch so that `main` remains unchanged.
 The trainer integration is task-agnostic; GSM8K is provided as the first runnable example in
-[`examples/gsm8k/run_opd.sh`](examples/gsm8k/run_opd.sh). This branch requires an OPD-enabled `verl` source
-checkout containing `verl.trainer.distillation` and `verl.experimental.teacher_loop`; set `VERL_ROOT` when it
-is not already installed in the active Python environment.
+[`examples/gsm8k/run_opd.sh`](examples/gsm8k/run_opd.sh).
+
+Starting from an existing verl-compatible Python environment, install the pinned Agent-R1 OPD fork and run the
+example directly; no StepPO checkout is needed:
+
+```bash
+git clone --branch opd https://github.com/AgentR1/Agent-R1.git
+cd Agent-R1
+bash scripts/install_opd.sh
+
+python3 -m recipes.gsm8k.data_preprocess.process_gsm8k --local_save_dir ~/data/gsm8k
+bash examples/gsm8k/run_opd.sh
+```
+
+The installer uses [`requirements-opd.txt`](requirements-opd.txt), which pins the compatible verl commit. Set
+`PYTHON_BIN` to select another Python executable. `VERL_REPO` and `VERL_REF` are optional overrides for fork
+development.
 
 - `main` contains the current v0.1.0 architecture based on Step-level MDP and layered abstractions.
 - `legacy` preserves the previous implementation for reference.

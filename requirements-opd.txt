@@ -1,0 +1,3 @@
+# Agent-R1 OPD-compatible verl, pinned for reproducible installation.
+# Keep this commit in sync with scripts/install_opd.sh.
+verl @ git+https://github.com/fishsure/verl.git@5779c7c6782733f77ef640f557bea572dfeacc12
