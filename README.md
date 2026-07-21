@@ -16,6 +16,7 @@ Unlike single-turn RL pipelines that treat interaction as one growing prompt-res
 
 ## News
 
+- [2026.07.21] **Agent-R1 now supports Online Policy Distillation (OPD).** Generic OPD training support is available on the [`opd`](https://github.com/AgentR1/Agent-R1/tree/opd) branch.
 - [2026.05.30] **A substantially revised Agent-R1 technical report is released.** The updated report presents Agent-R1's step-level trajectory representation, flexible context management, and layered abstractions for agentic reinforcement learning. [[Paper](https://arxiv.org/abs/2511.14460)]
 - [2026.05.29] **Agent-R1 integrates [StepPO](https://arxiv.org/abs/2604.18401), expands recipe coverage, and releases processed data.** The framework now includes StepPO-style training support together with recipe integrations for HotpotQA, ALFWorld, WebShop, and academic paper search. Processed datasets are available on [ModelScope](https://www.modelscope.cn/datasets/Melmaphother/Agent-R1-data).
 - [2026.03.23] **Agent-R1 v0.1.0 is the first official release of the refactored architecture.** It introduces the **Step-level MDP** foundation and new **Layered Abstractions**. The previous implementation is archived on the `legacy` branch.
