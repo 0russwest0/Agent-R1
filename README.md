@@ -166,6 +166,14 @@ Typical migration checklist:
 
 ## Version Guide
 
+### OPD support
+
+Generic on-policy distillation (OPD) support is maintained on the `opd` branch so that `main` remains unchanged.
+The trainer integration is task-agnostic; GSM8K is provided as the first runnable example in
+[`examples/gsm8k/run_opd.sh`](examples/gsm8k/run_opd.sh). This branch requires an OPD-enabled `verl` source
+checkout containing `verl.trainer.distillation` and `verl.experimental.teacher_loop`; set `VERL_ROOT` when it
+is not already installed in the active Python environment.
+
 - `main` contains the current v0.1.0 architecture based on Step-level MDP and layered abstractions.
 - `legacy` preserves the previous implementation for reference.
 - Use a recent source checkout of `verl` that includes the AgentFlow / async rollout stack required by this repository.

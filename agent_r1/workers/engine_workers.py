@@ -24,6 +24,7 @@ from tensordict import NonTensorData, TensorDict
 
 from agent_r1.workers.utils.losses import ppo_loss
 from verl.single_controller.base.decorator import Dispatch, make_nd_compute_dataproto_dispatch_fn, register
+from verl.trainer.distillation import distillation_ppo_loss
 from verl.utils import tensordict_utils as tu
 from verl.utils.config import omega_conf_to_dataclass
 from verl.utils.py_functional import append_to_dict
@@ -190,5 +191,13 @@ class ActorRolloutRefWorker(VerlActorRolloutRefWorker):
         if "actor" in self.role:
             actor_config: ActorConfig = omega_conf_to_dataclass(self.config.actor)
             actor_config.model_config = self.config.model
-            self.loss_fn = partial(ppo_loss, config=actor_config)
+            if self.distillation_enabled:
+                distillation_config = omega_conf_to_dataclass(self.distillation_config)
+                self.loss_fn = partial(
+                    distillation_ppo_loss,
+                    config=actor_config,
+                    distillation_config=distillation_config,
+                )
+            else:
+                self.loss_fn = partial(ppo_loss, config=actor_config)
             self.actor.set_loss_fn(self.loss_fn)

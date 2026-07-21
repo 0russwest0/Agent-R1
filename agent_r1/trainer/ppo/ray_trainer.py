@@ -41,6 +41,7 @@ from verl.protocol import pad_dataproto_to_divisor
 from verl.single_controller.ray import RayClassWithInitArgs
 from verl.single_controller.ray.base import create_colocated_worker_cls
 from verl.trainer.config import AlgoConfig
+from verl.trainer.distillation import is_distillation_enabled
 from verl.trainer.ppo.core_algos import agg_loss
 from verl.trainer.ppo.metric_utils import (
     compute_throughout_metrics,
@@ -370,6 +371,7 @@ class RayAgentTrainer(RayPPOTrainer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.use_reward_loop = True
+        self.use_teacher_policy = is_distillation_enabled(self.config.get("distillation"))
         adv_estimator = AgentAdvantageEstimator(self.config.algorithm.adv_estimator)
         if adv_estimator in (AgentAdvantageEstimator.GAE, AgentAdvantageEstimator.TOKEN_GAE):
             if self.config.critic.enable is False:
@@ -746,6 +748,7 @@ class RayAgentTrainer(RayPPOTrainer):
             actor_rollout_cls = RayClassWithInitArgs(
                 cls=self.role_worker_mapping[actor_role],
                 config=self.config.actor_rollout_ref,
+                distillation_config=self.config.get("distillation"),
                 role=str(actor_role),
             )
             self.resource_pool_to_cls[resource_pool][str(actor_role)] = actor_rollout_cls
@@ -817,6 +820,8 @@ class RayAgentTrainer(RayPPOTrainer):
         wg_kwargs["device_name"] = self.device_name
 
         for resource_pool, class_dict in self.resource_pool_to_cls.items():
+            if not class_dict:
+                continue
             worker_dict_cls = create_colocated_worker_cls(class_dict=class_dict)
             wg_dict = self.ray_worker_group_cls(
                 resource_pool=resource_pool,
@@ -867,10 +872,22 @@ class RayAgentTrainer(RayPPOTrainer):
         else:
             rm_resource_pool = None
 
+        if self.use_teacher_policy:
+            from verl.experimental.teacher_loop import MultiTeacherModelManager
+
+            teacher_resource_pool = self.resource_pool_manager.get_resource_pool(Role.TeacherModel)
+            self.teacher_model_manager = MultiTeacherModelManager(
+                config=self.config,
+                resource_pool=teacher_resource_pool,
+            )
+        else:
+            self.teacher_model_manager = None
+
         self.async_rollout_manager = AgentFlowManager(
             config=self.config,
             worker_group=self.actor_rollout_wg,
             rm_resource_pool=rm_resource_pool,
+            teacher_client=self.teacher_model_manager.get_client() if self.use_teacher_policy else None,
         )
 
     def fit(self):

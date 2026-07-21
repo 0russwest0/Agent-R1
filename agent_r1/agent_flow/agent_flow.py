@@ -35,6 +35,7 @@ from verl.experimental.agent_loop.agent_loop import (
 )
 from verl.experimental.agent_loop.prometheus_utils import update_prometheus_config
 from verl.experimental.agent_loop.utils import resolve_config_path
+from verl.experimental.teacher_loop.teacher_manager import AsyncTeacherLLMServerManager
 from verl.protocol import DataProto
 from verl.single_controller.ray.base import RayResourcePool, RayWorkerGroup
 from verl.utils import hf_processor, hf_tokenizer
@@ -821,7 +822,11 @@ class AgentFlowManager:
     """Agent flow manager that manages a group of agent flow workers."""
 
     def __init__(
-        self, config: DictConfig, worker_group: RayWorkerGroup = None, rm_resource_pool: RayResourcePool = None
+        self,
+        config: DictConfig,
+        worker_group: RayWorkerGroup = None,
+        rm_resource_pool: RayResourcePool = None,
+        teacher_client: dict | None = None,
     ):
         """Initialize agent flow manager.
 
@@ -834,6 +839,9 @@ class AgentFlowManager:
         self.worker_group = worker_group
         self.reward_model_manager = None
         self.reward_router_address = None
+        self.teacher_server_manager = (
+            AsyncTeacherLLMServerManager(config, teacher_client) if teacher_client is not None else None
+        )
         if self.config.reward_model.enable:
             from verl.experimental.reward_loop import RewardModelManager
 
@@ -909,6 +917,46 @@ class AgentFlowManager:
                 ).remote(self.config, self.server_handles, self.reward_router_address)
             )
 
+    async def _compute_teacher_logprobs(self, output: DataProto) -> DataProto:
+        """Attach aligned teacher token ids and log probabilities to an on-policy rollout."""
+        if self.teacher_server_manager is None:
+            return output
+
+        input_ids = output.batch["input_ids"]
+        attention_mask = output.batch["attention_mask"].bool()
+        response_mask = output.batch["response_mask"].bool()
+        prompt_width = output.batch["prompts"].shape[1]
+        response_width = output.batch["responses"].shape[1]
+        pad_token_id = self.config.actor_rollout_ref.rollout.get("pad_token_id", 0)
+        teacher_key_name = self.teacher_server_manager.teacher_key
+
+        async def compute_one(index: int):
+            sequence_ids = input_ids[index][attention_mask[index]].tolist()
+            prompt_length = int(attention_mask[index, :prompt_width].sum().item())
+            response_length = int(response_mask[index].sum().item())
+            routing_key = None
+            if teacher_key_name in output.non_tensor_batch:
+                routing_key = output.non_tensor_batch[teacher_key_name][index]
+            teacher_ids, teacher_logprobs = await self.teacher_server_manager.compute_teacher_logprobs_single(
+                sequence_ids=sequence_ids,
+                routing_key=routing_key,
+            )
+            left_pad_size = prompt_width - prompt_length
+            right_pad_size = response_width - response_length
+            sequence_padding = (left_pad_size, right_pad_size)
+            teacher_ids = torch.nn.functional.pad(teacher_ids, sequence_padding, value=pad_token_id).unsqueeze(0)
+            if teacher_logprobs.dim() == 1:
+                logprob_padding = sequence_padding
+            else:
+                logprob_padding = (0, 0, left_pad_size, right_pad_size)
+            teacher_logprobs = torch.nn.functional.pad(teacher_logprobs, logprob_padding, value=0.0).unsqueeze(0)
+            return teacher_ids, teacher_logprobs
+
+        results = await asyncio.gather(*(compute_one(index) for index in range(len(output))))
+        output.batch["teacher_ids"] = torch.cat([item[0] for item in results], dim=0)
+        output.batch["teacher_logprobs"] = torch.cat([item[1] for item in results], dim=0)
+        return output
+
     def generate_sequences(self, prompts: DataProto) -> DataProto:
         """Split input batch and dispatch to agent loop workers.
 
@@ -932,6 +980,8 @@ class AgentFlowManager:
             ]
         )
         output = DataProto.concat(outputs)
+        if self.teacher_server_manager is not None:
+            output = asyncio.run(self._compute_teacher_logprobs(output))
         self.sleep()
         if self.reward_model_manager:
             self.reward_model_manager.sleep()

@@ -24,6 +24,7 @@ from omegaconf import OmegaConf
 
 from agent_r1.trainer.ppo.ray_trainer import RayAgentTrainer, need_critic_agent_ppo
 from verl.trainer.constants_ppo import get_ppo_ray_runtime_env
+from verl.trainer.distillation import is_distillation_enabled
 from verl.trainer.ppo.reward import load_reward_manager
 from verl.trainer.ppo.utils import need_reference_policy
 from verl.utils.config import validate_config
@@ -185,6 +186,14 @@ class TaskRunner:
         self.role_worker_mapping[Role.Critic] = ray.remote(CriticWorker)
         self.mapping[Role.Critic] = "global_pool"
 
+    def add_teacher_model_worker(self, config):
+        """Reserve the teacher resource pool used by on-policy distillation."""
+        if not is_distillation_enabled(config.get("distillation")):
+            return
+        from verl.trainer.ppo.ray_trainer import Role
+
+        self.mapping[Role.TeacherModel] = "teacher_pool"
+
     def init_resource_pool_mgr(self, config):
         """Initialize resource pool manager."""
 
@@ -192,6 +201,13 @@ class TaskRunner:
         resource_pool_spec = {
             global_pool_id: [config.trainer.n_gpus_per_node] * config.trainer.nnodes,
         }
+        distillation_config = config.get("distillation")
+        if is_distillation_enabled(distillation_config):
+            if distillation_config.n_gpus_per_node <= 0:
+                raise ValueError("config.distillation.n_gpus_per_node must be greater than 0")
+            if distillation_config.nnodes <= 0:
+                raise ValueError("config.distillation.nnodes must be greater than 0")
+            resource_pool_spec["teacher_pool"] = [distillation_config.n_gpus_per_node] * distillation_config.nnodes
         # TODO Here you can use the new registration method to support dynamic registration of roles
         if config.reward_model.enable_resource_pool:
             if config.reward_model.n_gpus_per_node <= 0:
@@ -267,6 +283,13 @@ class TaskRunner:
         print(f"TaskRunner hostname: {socket.gethostname()}, PID: {os.getpid()}")
         pprint(OmegaConf.to_container(config, resolve=True))
         OmegaConf.resolve(config)
+        if is_distillation_enabled(config.get("distillation")):
+            if config.trainer.get("use_legacy_worker_impl", "auto") != "disable":
+                raise ValueError("Agent-R1 OPD requires trainer.use_legacy_worker_impl=disable.")
+            if config.distillation.distillation_loss.loss_mode == "forward_kl_topk":
+                raise NotImplementedError(
+                    "Agent-R1 OPD currently supports estimator losses such as k1, k2, and k3."
+                )
 
         actor_rollout_cls, ray_worker_group_cls = self.add_actor_rollout_worker(config)
         self.add_critic_worker(config)
@@ -278,6 +301,7 @@ class TaskRunner:
         # finally, we combine all the rewards together
         # The reward type depends on the tag of the data
         self.add_reward_model_worker(config)
+        self.add_teacher_model_worker(config)
 
         # Add a reference policy worker if KL loss or KL reward is used.
         self.add_ref_policy_worker(config, actor_rollout_cls)
