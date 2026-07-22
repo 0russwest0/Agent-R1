@@ -1,3 +1,1 @@
-from .dp_critic import DataParallelPPOCritic
-
-__all__ = ["DataParallelPPOCritic"]
+# Removed: verl v0.8.0 no longer has DataParallelPPOCritic.

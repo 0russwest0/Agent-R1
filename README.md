@@ -77,7 +77,7 @@ The main loop is:
 
 ## Getting Started
 
-Agent-R1 uses the same environment setup as [verl](https://verl.readthedocs.io/en/latest/start/install.html), and the current version requires `verl==0.7.0`. You only need to clone this repository; there is no separate Agent-R1 installation step.
+Agent-R1 uses the same environment setup as [verl](https://verl.readthedocs.io/en/latest/start/install.html), and the current version requires `verl==0.8.0`. You only need to clone this repository; there is no separate Agent-R1 installation step.
 
 The recommended path is:
 
