@@ -200,4 +200,4 @@ If you find Agent-R1 useful in your research, please cite:
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=AgentR1/Agent-R1&type=Date)](https://www.star-history.com/#AgentR1/Agent-R1&Date)
+[![Star History Chart](https://star-history.dera.page/svg?repos=AgentR1/Agent-R1&type=Date)](https://star-history.dera.page/#AgentR1/Agent-R1&Date)
